@@ -3,7 +3,7 @@
     "peoplesafe-staging": {
       "command": "node",
       "args": [
-        "/Users/johnknowles/Library/CloudStorage/Dropbox/Antigravity/peoplesafe-mcp/dist/index.js"
+        "/path/to/peoplesafe-mcp/dist/index.js"
       ],
       "env": {
         "MCP_TRANSPORT": "stdio"

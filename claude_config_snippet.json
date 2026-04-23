@@ -5,7 +5,7 @@
       "args": [
         "-y",
         "tsx",
-        "/Users/johnknowles/Library/CloudStorage/Dropbox/Antigravity/peoplesafe-mcp/src/index.ts"
+        "/path/to/peoplesafe-mcp/src/index.ts"
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",

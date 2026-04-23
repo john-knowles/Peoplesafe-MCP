@@ -1,6 +1,6 @@
 # Peoplesafe MCP
 
-Production-grade MCP server for the Peoplesafe Nexus User Management API in staging.
+An experimental MCP server for the Peoplesafe Nexus User Management API in the Peoplesafe staging environment.
 
 Base URL: `https://api.staging.peoplesafe.tech/user-management`
 
@@ -95,7 +95,7 @@ File: `claude_config_snippet.json`
       "args": [
         "-y",
         "tsx",
-        "/Users/johnknowles/Library/CloudStorage/Dropbox/Antigravity/peoplesafe-mcp/src/index.ts"
+        "/path/to/peoplesafe-mcp/src/index.ts"
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",
@@ -137,7 +137,7 @@ File: `windsurf_mcp_config.json`
     "peoplesafe-staging": {
       "command": "node",
       "args": [
-        "/Users/johnknowles/Library/CloudStorage/Dropbox/Antigravity/peoplesafe-mcp/dist/index.js"
+        "/path/to/peoplesafe-mcp/dist/index.js"
       ],
       "env": {
         "MCP_TRANSPORT": "stdio"
