@@ -1,0 +1,16 @@
+{
+  "mcp": {
+    "servers": {
+      "peoplesafe-staging": {
+        "command": "npm",
+        "args": ["run", "start"],
+        "env": {
+          "MCP_TRANSPORT": "stdio"
+        }
+      }
+    }
+  },
+  "skills": [
+    "./skills/peoplesafe-staging"
+  ]
+}

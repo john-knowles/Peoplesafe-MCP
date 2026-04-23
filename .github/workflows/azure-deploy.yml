@@ -1,0 +1,86 @@
+# This workflow is intentionally dormant until the repository owner configures:
+# 1. a protected GitHub Environment such as `azure-staging`
+# 2. the required environment-scoped Azure OIDC secrets
+# 3. an Azure Function App and resource group to deploy to
+# Until then, it is safe to leave in the repo and it will do nothing unless
+# someone manually runs it and provides valid inputs plus approved environment access.
+name: Azure Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy"
+        required: true
+        default: "main"
+      environment:
+        description: "Protected GitHub environment to deploy to"
+        required: true
+        default: "azure-staging"
+      function_app_name:
+        description: "Azure Function App name"
+        required: true
+      resource_group:
+        description: "Azure resource group"
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    concurrency:
+      group: azure-deploy-${{ inputs.environment }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Prune dev dependencies
+        run: npm prune --omit=dev
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Configure app settings
+        run: |
+          az functionapp config appsettings set \
+            --resource-group "${{ inputs.resource_group }}" \
+            --name "${{ inputs.function_app_name }}" \
+            --settings \
+              MCP_TRANSPORT=sse \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              WEBSITE_RUN_FROM_PACKAGE=1 \
+              FUNCTIONS_NODE_BLOCK_ON_ENTRY_POINT_ERROR=true
+
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ inputs.function_app_name }}
+          package: .

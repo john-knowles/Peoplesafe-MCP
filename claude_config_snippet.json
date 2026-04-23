@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "peoplesafe-staging": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tsx",
+        "/Users/johnknowles/Library/CloudStorage/Dropbox/Antigravity/peoplesafe-mcp/src/index.ts"
+      ],
+      "env": {
+        "MCP_TRANSPORT": "stdio",
+        "PEOPLESAFE_AUTH_TOKEN": "",
+        "PEOPLESAFE_SUBSCRIPTION_KEY": ""
+      }
+    }
+  }
+}

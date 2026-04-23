@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "PeoplesafeStaging": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/dist/index.js"],
+      "env": {
+        "MCP_TRANSPORT": "stdio",
+        "PEOPLESAFE_AUTH_TOKEN": "${env:PEOPLESAFE_AUTH_TOKEN}",
+        "PEOPLESAFE_SUBSCRIPTION_KEY": "${env:PEOPLESAFE_SUBSCRIPTION_KEY}"
+      }
+    }
+  }
+}
