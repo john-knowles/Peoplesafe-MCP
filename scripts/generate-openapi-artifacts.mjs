@@ -195,6 +195,7 @@ function buildInputSchemaExpression(operation) {
     : null;
 
   const parts = [
+    `baseUrl: z.string().url().optional()`,
     `authToken: z.string().min(1).optional()`,
     `subscriptionKey: z.string().min(1).optional()`
   ];

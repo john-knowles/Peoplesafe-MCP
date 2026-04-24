@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { ZodError } from "zod";
 import type { OperationDefinition } from "../generated/operations.js";
-import { MISSING_AUTH_MESSAGE, resolveAuthHeaders } from "../lib/auth.js";
+import { MISSING_CONTEXT_MESSAGE, resolveApiContext } from "../lib/auth.js";
 import { executeOperation, PeoplesafeApiError } from "../lib/peoplesafe-api.js";
 import { jsonToolResult, textToolResult } from "../lib/results.js";
 
@@ -16,17 +16,17 @@ export function registerOperations(server: McpServer, operations: OperationDefin
         inputSchema: operation.inputSchema
       },
       async (input): Promise<CallToolResult> => {
-        const authHeaders = resolveAuthHeaders(input);
+        const apiContext = resolveApiContext(input);
 
-        if (!authHeaders) {
-          return textToolResult(MISSING_AUTH_MESSAGE, true);
+        if (!apiContext) {
+          return textToolResult(MISSING_CONTEXT_MESSAGE, true);
         }
 
         try {
           const result = await executeOperation({
             operation,
             input,
-            authHeaders
+            apiContext
           });
 
           return jsonToolResult({

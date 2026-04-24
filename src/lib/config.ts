@@ -1,4 +1,3 @@
-export const DEFAULT_PEOPLESAFE_BASE_URL = "https://api.staging.peoplesafe.tech/user-management";
 export const DEFAULT_REQUEST_TIMEOUT_MS = 15000;
 export const DEFAULT_HTTP_HOST = "127.0.0.1";
 export const DEFAULT_CLOUD_HTTP_HOST = "0.0.0.0";
@@ -9,8 +8,8 @@ export const DEFAULT_SSE_MESSAGE_PATH = "/messages";
 
 export type RuntimeTransport = "stdio" | "sse" | "http";
 
-export function getBaseUrl(): string {
-  return process.env.PEOPLESAFE_BASE_URL?.trim() || DEFAULT_PEOPLESAFE_BASE_URL;
+export function getBaseUrl(): string | undefined {
+  return process.env.PEOPLESAFE_BASE_URL?.trim() || undefined;
 }
 
 export function getRequestTimeoutMs(): number {

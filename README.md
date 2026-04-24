@@ -2,8 +2,6 @@
 
 An experimental MCP server for the Peoplesafe Nexus User Management API, supporting multiple environments (Dev, Test, Staging, Production).
 
-Default Base URL: `https://api.staging.peoplesafe.tech/user-management`
-
 This repository exposes dedicated MCP tools for every `Person`, `Team`, and `ReportingGroup` endpoint defined in the Peoplesafe API, with generated `zod` validation and dual-key BYOK authentication.
 
 ## What’s Included
@@ -32,17 +30,17 @@ Credential resolution order:
 
 If either value is missing, the server returns this exact instruction:
 
-`I need your Peoplesafe Auth Token and Subscription Key to proceed.`
+`I need your Peoplesafe API Base URL, Auth Token, and Subscription Key to proceed.`
 
 ## Configuration
 
 The server supports the following environment variables, which can be set in your MCP client's configuration:
 
-- `PEOPLESAFE_BASE_URL`: The base URL for the Peoplesafe API (e.g., for Dev, Test, Staging, or Production). Defaults to staging.
+- `PEOPLESAFE_BASE_URL`: The base URL for the Peoplesafe API (e.g., for Dev, Test, Staging, or Production).
 - `PEOPLESAFE_AUTH_TOKEN`: (Optional) Your Peoplesafe Auth Token.
 - `PEOPLESAFE_SUBSCRIPTION_KEY`: (Optional) Your Peoplesafe Subscription Key.
 
-If tokens are provided in the configuration, the MCP will use them automatically. If they are omitted or empty, the MCP will ask you for them during the first tool call.
+If these values are provided in the configuration, the MCP will use them automatically. If they are omitted or empty, the MCP will ask you for them during the first tool call.
 
 ## Build And Run
 
@@ -109,7 +107,7 @@ File: `claude_config_snippet.json`
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+        "PEOPLESAFE_BASE_URL": "",
         "PEOPLESAFE_AUTH_TOKEN": "",
         "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }
@@ -132,7 +130,7 @@ File: `.cursor/mcp.json`
       "args": ["run", "start"],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+        "PEOPLESAFE_BASE_URL": "",
         "PEOPLESAFE_AUTH_TOKEN": "",
         "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }
@@ -155,7 +153,7 @@ File: `windsurf_mcp_config.json`
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+        "PEOPLESAFE_BASE_URL": "",
         "PEOPLESAFE_AUTH_TOKEN": "",
         "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }
@@ -177,7 +175,7 @@ File: `.vscode/mcp.json`
       "args": ["${workspaceFolder}/dist/index.js"],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+        "PEOPLESAFE_BASE_URL": "",
         "PEOPLESAFE_AUTH_TOKEN": "${env:PEOPLESAFE_AUTH_TOKEN}",
         "PEOPLESAFE_SUBSCRIPTION_KEY": "${env:PEOPLESAFE_SUBSCRIPTION_KEY}"
       }
@@ -205,7 +203,7 @@ Files:
         "args": ["run", "start"],
         "env": {
           "MCP_TRANSPORT": "stdio",
-          "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+          "PEOPLESAFE_BASE_URL": "",
           "PEOPLESAFE_AUTH_TOKEN": "",
           "PEOPLESAFE_SUBSCRIPTION_KEY": ""
         }

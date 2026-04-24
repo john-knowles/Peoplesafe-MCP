@@ -9,7 +9,7 @@
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+        "PEOPLESAFE_BASE_URL": "",
         "PEOPLESAFE_AUTH_TOKEN": "",
         "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }

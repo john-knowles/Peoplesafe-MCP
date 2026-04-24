@@ -1,7 +1,7 @@
 import type { ZodTypeAny } from "zod";
 import type { OperationDefinition } from "../generated/operations.js";
-import type { PeoplesafeAuthHeaders } from "./auth.js";
-import { getBaseUrl, getRequestTimeoutMs } from "./config.js";
+import type { PeoplesafeApiContext } from "./auth.js";
+import { getRequestTimeoutMs } from "./config.js";
 
 export interface ApiErrorDetails {
   operation: string;
@@ -29,19 +29,19 @@ export interface ExecuteOperationArgs {
     query?: Record<string, unknown>;
     body?: unknown;
   };
-  authHeaders: PeoplesafeAuthHeaders;
+  apiContext: PeoplesafeApiContext;
 }
 
 export async function executeOperation({
   operation,
   input,
-  authHeaders
+  apiContext
 }: ExecuteOperationArgs): Promise<unknown> {
-  const url = buildUrl(operation, input.path ?? {}, input.query ?? {});
+  const url = buildUrl(operation, input.path ?? {}, input.query ?? {}, apiContext.baseUrl);
   const headers = new Headers({
     Accept: operation.responseContentType || "application/json",
-    "x-auth-token": authHeaders.authToken,
-    "X-Subscription-Key": authHeaders.subscriptionKey
+    "x-auth-token": apiContext.authToken,
+    "X-Subscription-Key": apiContext.subscriptionKey
   });
 
   const requestInit: RequestInit = {
@@ -78,7 +78,8 @@ export async function executeOperation({
 function buildUrl(
   operation: OperationDefinition,
   pathValues: Record<string, unknown>,
-  queryValues: Record<string, unknown>
+  queryValues: Record<string, unknown>,
+  baseUrl: string
 ): URL {
   let pathname = operation.path;
 
@@ -91,7 +92,7 @@ function buildUrl(
     pathname = pathname.replace(`{${parameter.name}}`, encodeURIComponent(String(value)));
   }
 
-  const url = new URL(pathname.startsWith("/") ? pathname.slice(1) : pathname, ensureTrailingSlash(getBaseUrl()));
+  const url = new URL(pathname.startsWith("/") ? pathname.slice(1) : pathname, ensureTrailingSlash(baseUrl));
 
   for (const parameter of operation.parameters) {
     if (parameter.location !== "query") {
