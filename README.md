@@ -99,11 +99,9 @@ File: `claude_config_snippet.json`
 {
   "mcpServers": {
     "peoplesafe": {
-      "command": "npx",
+      "command": "node",
       "args": [
-        "-y",
-        "tsx",
-        "/path/to/peoplesafe-mcp/src/index.ts"
+        "/path/to/peoplesafe-mcp/dist/index.js"
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",

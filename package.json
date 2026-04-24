@@ -10,7 +10,8 @@
   },
   "scripts": {
     "generate": "node ./scripts/generate-openapi-artifacts.mjs",
-    "build": "npm run generate && tsc --project tsconfig.json",
+    "build": "npm run generate && tsc --project tsconfig.json && npm run bundle",
+    "bundle": "esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.js --target=node20 && esbuild src/functionApp.ts --bundle --platform=node --format=esm --outfile=dist/functionApp.js --target=node20 --external:@azure/functions",
     "dev": "npm run generate && tsx watch src/index.ts",
     "dev:inspect": "npx -y @modelcontextprotocol/inspector node dist/index.js",
     "start": "node ./dist/index.js",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@modelcontextprotocol/inspector": "^0.16.8",
     "@types/node": "^22.15.30",
+    "esbuild": "^0.28.0",
     "tsx": "^4.19.2",
     "typescript": "^5.9.3"
   }

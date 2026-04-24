@@ -3,7 +3,7 @@
     "peoplesafe": {
       "command": "node",
       "args": [
-        "/path/to/peoplesafe-mcp/dist/index.js"
+        "dist/index.js"
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",

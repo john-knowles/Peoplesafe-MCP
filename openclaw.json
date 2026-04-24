@@ -2,8 +2,8 @@
   "mcp": {
     "servers": {
       "peoplesafe": {
-        "command": "npm",
-        "args": ["run", "start"],
+        "command": "node",
+        "args": ["dist/index.js"],
         "env": {
           "MCP_TRANSPORT": "stdio",
           "PEOPLESAFE_BASE_URL": "",
