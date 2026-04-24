@@ -1,6 +1,6 @@
-# Peoplesafe Staging User Management
+# Peoplesafe User Management
 
-Use this skill when you need to manage Peoplesafe staging people, teams, reporting groups, or app subscriptions through the local MCP server.
+Use this skill when you need to manage Peoplesafe people, teams, reporting groups, or app subscriptions through the local MCP server.
 
 ## Use This Skill For
 
@@ -14,9 +14,9 @@ Use this skill when you need to manage Peoplesafe staging people, teams, reporti
 
 ## Working Rules
 
-- Prefer the MCP tools exposed by the `peoplesafe-staging` server over hand-written HTTP requests.
-- If credentials are missing, ask the user for the Peoplesafe Staging Auth Token and Subscription Key.
-- Treat the staging environment as real shared infrastructure and confirm destructive operations when appropriate.
+- Prefer the MCP tools exposed by the `peoplesafe` server over hand-written HTTP requests.
+- If credentials are missing, ask the user for the Peoplesafe Auth Token and Subscription Key.
+- Treat the environment as real shared infrastructure and confirm destructive operations when appropriate.
 - When performing lookups, prefer the most specific identifier the user has available.
 
 ## Tool Families

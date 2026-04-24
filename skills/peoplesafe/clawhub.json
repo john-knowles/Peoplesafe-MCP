@@ -1,0 +1,19 @@
+{
+  "name": "peoplesafe",
+  "version": "0.1.0",
+  "title": "Peoplesafe User Management",
+  "description": "Autonomous agent skill for managing Peoplesafe people, teams, and reporting groups through the local MCP server.",
+  "entry": "SKILL.md",
+  "mcpServers": ["peoplesafe"],
+  "capabilities": [
+    "person-management",
+    "team-management",
+    "reporting-group-management",
+    "subscription-management"
+  ],
+  "tags": [
+    "mcp",
+    "peoplesafe",
+    "user-management"
+  ]
+}

@@ -1,12 +1,15 @@
 {
   "mcpServers": {
-    "peoplesafe-staging": {
+    "peoplesafe": {
       "command": "node",
       "args": [
         "/path/to/peoplesafe-mcp/dist/index.js"
       ],
       "env": {
-        "MCP_TRANSPORT": "stdio"
+        "MCP_TRANSPORT": "stdio",
+        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+        "PEOPLESAFE_AUTH_TOKEN": "",
+        "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }
     }
   }

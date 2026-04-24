@@ -1,10 +1,10 @@
 # Peoplesafe MCP
 
-An experimental MCP server for the Peoplesafe Nexus User Management API in the Peoplesafe staging environment.
+An experimental MCP server for the Peoplesafe Nexus User Management API, supporting multiple environments (Dev, Test, Staging, Production).
 
-Base URL: `https://api.staging.peoplesafe.tech/user-management`
+Default Base URL: `https://api.staging.peoplesafe.tech/user-management`
 
-This repository exposes dedicated MCP tools for every `Person`, `Team`, and `ReportingGroup` endpoint defined in `openapi/nexus-api-resource-staging.json`, with generated `zod` validation and dual-key BYOK authentication.
+This repository exposes dedicated MCP tools for every `Person`, `Team`, and `ReportingGroup` endpoint defined in the Peoplesafe API, with generated `zod` validation and dual-key BYOK authentication.
 
 ## What’s Included
 
@@ -32,7 +32,17 @@ Credential resolution order:
 
 If either value is missing, the server returns this exact instruction:
 
-`I need your Peoplesafe Staging Auth Token and Subscription Key to proceed.`
+`I need your Peoplesafe Auth Token and Subscription Key to proceed.`
+
+## Configuration
+
+The server supports the following environment variables, which can be set in your MCP client's configuration:
+
+- `PEOPLESAFE_BASE_URL`: The base URL for the Peoplesafe API (e.g., for Dev, Test, Staging, or Production). Defaults to staging.
+- `PEOPLESAFE_AUTH_TOKEN`: (Optional) Your Peoplesafe Auth Token.
+- `PEOPLESAFE_SUBSCRIPTION_KEY`: (Optional) Your Peoplesafe Subscription Key.
+
+If tokens are provided in the configuration, the MCP will use them automatically. If they are omitted or empty, the MCP will ask you for them during the first tool call.
 
 ## Build And Run
 
@@ -78,8 +88,8 @@ The server automatically honors Azure’s assigned `PORT` and binds to `0.0.0.0`
 | Claude Desktop | `claude_config_snippet.json` | `stdio` | Uses `npx` + `tsx`. On Windows merge into `%APPDATA%\\Claude\\claude_desktop_config.json`. |
 | Cursor | `.cursor/mcp.json` | `stdio` | Workspace config using `npm run start`. |
 | Windsurf | `windsurf_mcp_config.json` | `stdio` | Compatible with `mcpServers` format used by Cascade clients. |
-| VS Code | `.vscode/mcp.json` | `stdio` | Workspace-level MCP config with server name `PeoplesafeStaging`. |
-| OpenClaw | `openclaw.json` + `skills/peoplesafe-staging/clawhub.json` | `stdio` | Includes a repo-local skill manifest and skill instructions. |
+| VS Code | `.vscode/mcp.json` | `stdio` | Workspace-level MCP config with server name `Peoplesafe`. |
+| OpenClaw | `openclaw.json` + `skills/peoplesafe/clawhub.json` | `stdio` | Includes a repo-local skill manifest and skill instructions. |
 
 ## Copy-Paste Configs
 
@@ -90,7 +100,7 @@ File: `claude_config_snippet.json`
 ```json
 {
   "mcpServers": {
-    "peoplesafe-staging": {
+    "peoplesafe": {
       "command": "npx",
       "args": [
         "-y",
@@ -99,6 +109,7 @@ File: `claude_config_snippet.json`
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",
+        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
         "PEOPLESAFE_AUTH_TOKEN": "",
         "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }
@@ -116,11 +127,14 @@ File: `.cursor/mcp.json`
 ```json
 {
   "mcpServers": {
-    "peoplesafe-staging": {
+    "peoplesafe": {
       "command": "npm",
       "args": ["run", "start"],
       "env": {
-        "MCP_TRANSPORT": "stdio"
+        "MCP_TRANSPORT": "stdio",
+        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+        "PEOPLESAFE_AUTH_TOKEN": "",
+        "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }
     }
   }
@@ -134,13 +148,16 @@ File: `windsurf_mcp_config.json`
 ```json
 {
   "mcpServers": {
-    "peoplesafe-staging": {
+    "peoplesafe": {
       "command": "node",
       "args": [
         "/path/to/peoplesafe-mcp/dist/index.js"
       ],
       "env": {
-        "MCP_TRANSPORT": "stdio"
+        "MCP_TRANSPORT": "stdio",
+        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+        "PEOPLESAFE_AUTH_TOKEN": "",
+        "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }
     }
   }
@@ -154,12 +171,13 @@ File: `.vscode/mcp.json`
 ```json
 {
   "servers": {
-    "PeoplesafeStaging": {
+    "Peoplesafe": {
       "type": "stdio",
       "command": "node",
       "args": ["${workspaceFolder}/dist/index.js"],
       "env": {
         "MCP_TRANSPORT": "stdio",
+        "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
         "PEOPLESAFE_AUTH_TOKEN": "${env:PEOPLESAFE_AUTH_TOKEN}",
         "PEOPLESAFE_SUBSCRIPTION_KEY": "${env:PEOPLESAFE_SUBSCRIPTION_KEY}"
       }
@@ -173,8 +191,8 @@ File: `.vscode/mcp.json`
 Files:
 
 - `openclaw.json`
-- `skills/peoplesafe-staging/clawhub.json`
-- `skills/peoplesafe-staging/SKILL.md`
+- `skills/peoplesafe/clawhub.json`
+- `skills/peoplesafe/SKILL.md`
 
 `openclaw.json`
 
@@ -182,16 +200,19 @@ Files:
 {
   "mcp": {
     "servers": {
-      "peoplesafe-staging": {
+      "peoplesafe": {
         "command": "npm",
         "args": ["run", "start"],
         "env": {
-          "MCP_TRANSPORT": "stdio"
+          "MCP_TRANSPORT": "stdio",
+          "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+          "PEOPLESAFE_AUTH_TOKEN": "",
+          "PEOPLESAFE_SUBSCRIPTION_KEY": ""
         }
       }
     }
   },
-  "skills": ["./skills/peoplesafe-staging"]
+  "skills": ["./skills/peoplesafe"]
 }
 ```
 

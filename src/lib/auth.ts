@@ -1,5 +1,5 @@
 export const MISSING_AUTH_MESSAGE =
-  "I need your Peoplesafe Staging Auth Token and Subscription Key to proceed.";
+  "I need your Peoplesafe Auth Token and Subscription Key to proceed.";
 
 export interface AuthOverrideInput {
   authToken?: string | undefined;

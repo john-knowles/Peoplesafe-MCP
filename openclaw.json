@@ -1,16 +1,19 @@
 {
   "mcp": {
     "servers": {
-      "peoplesafe-staging": {
+      "peoplesafe": {
         "command": "npm",
         "args": ["run", "start"],
         "env": {
-          "MCP_TRANSPORT": "stdio"
+          "MCP_TRANSPORT": "stdio",
+          "PEOPLESAFE_BASE_URL": "https://api.staging.peoplesafe.tech/user-management",
+          "PEOPLESAFE_AUTH_TOKEN": "",
+          "PEOPLESAFE_SUBSCRIPTION_KEY": ""
         }
       }
     }
   },
   "skills": [
-    "./skills/peoplesafe-staging"
+    "./skills/peoplesafe"
   ]
 }
