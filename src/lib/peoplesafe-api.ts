@@ -224,16 +224,19 @@ function parseSuccessfulPayload(
   return {
     ok: true,
     status,
-    data: parsePayloadWithSchema(operation.responseSchema, payload, { strict: true })
+    data: parsePayloadWithSchema(operation.responseSchema, payload, {
+      strict: false,
+      context: `success response for ${operation.toolName}`
+    })
   };
 }
 
 function parsePayloadWithSchema(
   schema: ZodTypeAny | undefined,
   payload: unknown,
-  options: { strict?: boolean } = {}
+  options: { strict?: boolean; context?: string } = {}
 ): unknown {
-  const { strict = true } = options;
+  const { strict = true, context = "payload" } = options;
   if (!schema) {
     return payload;
   }
@@ -241,9 +244,19 @@ function parsePayloadWithSchema(
   try {
     return schema.parse(payload);
   } catch (error) {
-    if (strict && error instanceof ZodError) {
-      throw new PeoplesafeValidationError("API response validation failed", error.issues);
+    if (error instanceof ZodError) {
+      if (strict) {
+        throw new PeoplesafeValidationError("API response validation failed", error.issues);
+      }
+
+      const message = error.issues
+        .map((issue) => `${issue.path.join(".") || "<root>"}: ${issue.message}`)
+        .join("; ");
+      process.stderr.write(
+        `Warning: Peoplesafe ${context} validation failed, returning raw payload. ${message}\n`
+      );
     }
+
     return payload;
   }
 }

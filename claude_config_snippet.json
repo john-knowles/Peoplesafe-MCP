@@ -7,9 +7,7 @@
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "",
-        "PEOPLESAFE_AUTH_TOKEN": "",
-        "PEOPLESAFE_SUBSCRIPTION_KEY": ""
+        "PEOPLESAFE_CONFIG_FILE": "/absolute/path/to/peoplesafe.credentials.json"
       }
     }
   }

@@ -29,26 +29,26 @@ export interface OperationDefinition {
 }
 
 export const PersonCreateInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => CreatePersonRequestSchema).optional()
 }).strict();
 
 export const PersonDeleteInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonArchiveInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonUpdateInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -56,7 +56,7 @@ export const PersonUpdateInputSchema = z.object({
 }).strict();
 
 export const PersonAssignAppSubscriptionInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -64,84 +64,84 @@ export const PersonAssignAppSubscriptionInputSchema = z.object({
 }).strict();
 
 export const GroupCreateInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => CreateReportingGroupRequestSchema).optional()
 }).strict();
 
 export const GroupUpdateInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => UpdateReportingGroupRequestSchema).optional()
 }).strict();
 
 export const GroupDeleteInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => DeleteReportingGroupRequestSchema).optional()
 }).strict();
 
 export const GroupAssignManagerInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => AssignManagerToGroupRequestSchema).optional()
 }).strict();
 
 export const GroupAssignMemberInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => AssignGroupMemberRequestSchema).optional()
 }).strict();
 
 export const GroupRemoveMemberInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => RemoveGroupMemberRequestSchema).optional()
 }).strict();
 
 export const GroupRemoveManagerInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => RemoveManagerFromGroupRequestSchema).optional()
 }).strict();
 
 export const TeamCreateInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => CreateTeamRequestSchema).optional()
 }).strict();
 
 export const TeamUpdateInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => UpdateTeamRequestSchema).optional()
 }).strict();
 
 export const TeamDeleteInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => DeleteTeamRequestSchema).optional()
 }).strict();
 
 export const TeamAssignManagerInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => AssignManagerToTeamRequestSchema).optional()
 }).strict();
 
 export const TeamAssignUsersInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => AssignUsersToTeamRequestSchema).optional()
 }).strict();
 
 export const TeamRemoveManagerInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => RemoveManagerFromTeamRequestSchema).optional()
 }).strict();
 
 export const TeamRemoveUserInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => RemoveUserFromTeamRequestSchema).optional()
 }).strict();
 
 export const TeamGetUsersInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonListInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   query: z.object({
   "Page": z.number().int(),
   "PageSize": z.number().int(),
@@ -153,35 +153,35 @@ export const PersonListInputSchema = z.object({
 }).strict();
 
 export const PersonGetInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const GroupGetInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const GroupGetMembersInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const TeamGetInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonPatchInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -189,12 +189,12 @@ export const PersonPatchInputSchema = z.object({
 }).strict();
 
 export const GroupPatchParentGroupsInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => PatchGroupParentGroupsRequestSchema).optional()
 }).strict();
 
 export const TeamPatchPersonMembershipInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -202,7 +202,7 @@ export const TeamPatchPersonMembershipInputSchema = z.object({
 }).strict();
 
 export const TeamPatchPersonManagementInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -210,12 +210,12 @@ export const TeamPatchPersonManagementInputSchema = z.object({
 }).strict();
 
 export const TeamPatchParentGroupsInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => PatchTeamParentGroupsRequestSchema).optional()
 }).strict();
 
 export const TeamListInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   query: z.object({
   "Page": z.number().int(),
   "PageSize": z.number().int()
@@ -223,18 +223,18 @@ export const TeamListInputSchema = z.object({
 }).strict();
 
 export const PersonListSubscriptionsInputSchema = z.object({
-  baseUrl: z.string().url().optional()
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL.")
 }).strict();
 
 export const PersonGetSubscriptionInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonAssignSubscriptionInputSchema = z.object({
-  baseUrl: z.string().url().optional(),
+  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),

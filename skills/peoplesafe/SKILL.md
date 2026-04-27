@@ -29,7 +29,8 @@ Use this skill when you need to manage Peoplesafe people, teams, reporting group
 
 The MCP server accepts credentials via:
 
-- tool inputs: `authToken`, `subscriptionKey`
-- environment variables: `PEOPLESAFE_AUTH_TOKEN`, `PEOPLESAFE_SUBSCRIPTION_KEY`
+- tool inputs: `authToken`, `subscriptionKey` (and optional `baseUrl`)
+- environment variables: `PEOPLESAFE_BASE_URL`, `PEOPLESAFE_AUTH_TOKEN`, `PEOPLESAFE_SUBSCRIPTION_KEY`
+- JSON file or inline JSON via `PEOPLESAFE_CONFIG_FILE`, `PEOPLESAFE_CONFIG_JSON`, or `--config`
 
 If credentials are unavailable, pause and ask for them instead of retrying blindly.

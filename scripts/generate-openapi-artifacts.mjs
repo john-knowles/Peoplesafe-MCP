@@ -195,7 +195,8 @@ function buildInputSchemaExpression(operation) {
     : null;
 
   const parts = [
-    `baseUrl: z.string().url().optional()`
+    // Claude often sends null or "" for optional fields; coerce before .url() so validation passes and env-based base URL can be used.
+    `baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL.")`
   ];
 
   if (pathParameters.length > 0) {

@@ -1,3 +1,5 @@
+import { resolvePeoplesafeBaseUrlFromEnv } from "./auth.js";
+
 export const DEFAULT_REQUEST_TIMEOUT_MS = 15000;
 export const DEFAULT_HTTP_HOST = "127.0.0.1";
 export const DEFAULT_CLOUD_HTTP_HOST = "0.0.0.0";
@@ -10,7 +12,7 @@ export const DEFAULT_MAX_RETRIES = 3;
 export type RuntimeTransport = "stdio" | "sse" | "http";
 
 export function getBaseUrl(): string | undefined {
-  return process.env.PEOPLESAFE_BASE_URL?.trim() || undefined;
+  return resolvePeoplesafeBaseUrlFromEnv();
 }
 
 export function getRequestTimeoutMs(): number {

@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { ZodError } from "zod";
 import type { OperationDefinition } from "../generated/operations.js";
-import { MISSING_CONTEXT_MESSAGE, resolveApiContext } from "../lib/auth.js";
+import { buildMissingCredentialsMessage, resolveApiContext } from "../lib/auth.js";
 import { getMaxRetries } from "../lib/config.js";
 import { executeOperationWithRetry, PeoplesafeApiError, PeoplesafeValidationError } from "../lib/peoplesafe-api.js";
 import { jsonToolResult, textToolResult } from "../lib/results.js";
@@ -20,7 +20,7 @@ export function registerOperations(server: McpServer, operations: OperationDefin
         const apiContext = resolveApiContext(input);
 
         if (!apiContext) {
-          return textToolResult(MISSING_CONTEXT_MESSAGE, true);
+          return textToolResult(buildMissingCredentialsMessage(input), true);
         }
 
         try {
