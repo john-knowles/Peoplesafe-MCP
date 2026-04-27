@@ -3,6 +3,14 @@ import type { HttpRequest, HttpResponseInit, InvocationContext } from "@azure/fu
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { createMcpServer } from "../lib/server.js";
+import {
+  McpHttpPayloadTooLargeError,
+  parseUtf8BodyToJson,
+  readAzureHttpRequestBodyCapped
+} from "../lib/mcp-http-body-limit.js";
+import { verifyMcpHttpBearerAuth } from "../lib/mcp-http-auth.js";
+import { getMcpHttpMaxBodyBytes, getMcpHttpMaxSessions } from "../lib/config.js";
+import { evictOldestSessionIfMapAtCapacity } from "../lib/mcp-session-cap.js";
 
 interface AzureSession {
   server: ReturnType<typeof createMcpServer>;
@@ -14,8 +22,14 @@ export interface AzureMcpHandlerOptions {
   statefulSessions?: boolean;
 }
 
+async function closeAzureSession(session: AzureSession): Promise<void> {
+  await session.transport.close().catch(() => undefined);
+  await session.server.close().catch(() => undefined);
+}
+
 export function createAzureMcpHandler(options: AzureMcpHandlerOptions = {}) {
   const sessions = new Map<string, AzureSession>();
+  const maxSessions = getMcpHttpMaxSessions();
   const enableJsonResponse = options.enableJsonResponse ?? true;
   const statefulSessions = options.statefulSessions ?? false;
 
@@ -23,8 +37,33 @@ export function createAzureMcpHandler(options: AzureMcpHandlerOptions = {}) {
     request: HttpRequest,
     context: InvocationContext
   ): Promise<HttpResponseInit> {
-    const rawBody = request.method === "GET" || request.method === "HEAD" ? undefined : await request.text();
-    const parsedBody = parseBody(rawBody);
+    if (!verifyMcpHttpBearerAuth(request.headers.get("authorization"))) {
+      return {
+        status: 401,
+        headers: {
+          "WWW-Authenticate": 'Bearer realm="mcp"',
+          "Content-Type": "application/json"
+        },
+        jsonBody: { error: "Unauthorized" }
+      };
+    }
+
+    let rawBody: string | undefined;
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      try {
+        rawBody = await readAzureHttpRequestBodyCapped(request, getMcpHttpMaxBodyBytes());
+      } catch (error) {
+        if (error instanceof McpHttpPayloadTooLargeError) {
+          return jsonResponse(413, {
+            error: "Payload Too Large",
+            limitBytes: error.limitBytes
+          });
+        }
+        throw error;
+      }
+    }
+
+    const parsedBody = parseUtf8BodyToJson(rawBody ?? "");
     const sessionId = request.headers.get("mcp-session-id");
 
     let session = sessionId ? sessions.get(sessionId) : undefined;
@@ -48,6 +87,14 @@ export function createAzureMcpHandler(options: AzureMcpHandlerOptions = {}) {
         onsessioninitialized: (newSessionId) => {
           if (!statefulSessions) {
             return;
+          }
+          if (!sessions.has(newSessionId)) {
+            evictOldestSessionIfMapAtCapacity(
+              sessions,
+              maxSessions,
+              closeAzureSession,
+              "Azure MCP"
+            );
           }
           sessions.set(newSessionId, session!);
         },
@@ -76,7 +123,16 @@ export function createAzureMcpHandler(options: AzureMcpHandlerOptions = {}) {
     });
 
     if (statefulSessions && session.transport.sessionId) {
-      sessions.set(session.transport.sessionId, session);
+      const sid = session.transport.sessionId;
+      if (!sessions.has(sid)) {
+        evictOldestSessionIfMapAtCapacity(
+          sessions,
+          maxSessions,
+          closeAzureSession,
+          "Azure MCP"
+        );
+      }
+      sessions.set(sid, session);
     } else if (!statefulSessions) {
       await session.server.close();
     }
@@ -87,18 +143,6 @@ export function createAzureMcpHandler(options: AzureMcpHandlerOptions = {}) {
 }
 
 export const azureMcpHttpHandler = createAzureMcpHandler();
-
-function parseBody(rawBody: string | undefined): unknown {
-  if (!rawBody || !rawBody.trim()) {
-    return undefined;
-  }
-
-  try {
-    return JSON.parse(rawBody);
-  } catch {
-    return rawBody;
-  }
-}
 
 function jsonResponse(status: number, payload: unknown): HttpResponseInit {
   return {

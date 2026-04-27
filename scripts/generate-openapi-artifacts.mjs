@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const repoRoot = process.cwd();
-const openApiPath = path.join(repoRoot, "openapi", "nexus-api-resource-staging.json");
+const openApiPath = path.join(repoRoot, "openapi", "nexus-api-resource.json");
 const schemaOutputPath = path.join(repoRoot, "src", "schema.ts");
 const operationsOutputPath = path.join(repoRoot, "src", "generated", "operations.ts");
 
@@ -159,6 +159,13 @@ function renderZod(schema) {
       return withNullable(schema, "z.string().datetime({ offset: true })");
     }
 
+    if (schema.format === "email") {
+      const min = typeof schema.minLength === "number" && schema.minLength > 0 ? schema.minLength : 0;
+      const expr =
+        min > 0 ? `z.string().min(${min}).email()` : `z.string().email()`;
+      return withNullable(schema, expr);
+    }
+
     return withNullable(schema, "z.string()");
   }
 
@@ -194,10 +201,7 @@ function buildInputSchemaExpression(operation) {
       })()
     : null;
 
-  const parts = [
-    // Claude often sends null or "" for optional fields; coerce before .url() so validation passes and env-based base URL can be used.
-    `baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL.")`
-  ];
+  const parts = [];
 
   if (pathParameters.length > 0) {
     parts.push(`path: ${renderParameterGroup(pathParameters)}`);
@@ -209,6 +213,10 @@ function buildInputSchemaExpression(operation) {
 
   if (bodySchema) {
     parts.push(`body: ${operation.requestBody?.required ? bodySchema : `${bodySchema}.optional()`}`);
+  }
+
+  if (parts.length === 0) {
+    return `z.object({}).strict()`;
   }
 
   return `z.object({\n${parts.map((part) => `  ${part}`).join(",\n")}\n}).strict()`;
@@ -234,13 +242,6 @@ function renderSchemaFile() {
     .join(",\n");
 
   return `import { z } from "zod";
-
-export const AuthHeaderOverrideSchema = z
-  .object({
-    authToken: z.string().min(1).optional(),
-    subscriptionKey: z.string().min(1).optional()
-  })
-  .strict();
 
 ${declarations}
 

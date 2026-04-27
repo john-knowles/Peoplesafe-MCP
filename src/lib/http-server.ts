@@ -5,7 +5,22 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { createMcpServer } from "./server.js";
-import { getHttpHost, getHttpPort, getLegacySseMessagesPath, getLegacySsePath, getMcpPath } from "./config.js";
+import { assertMcpHttpBearerOr401 } from "./mcp-http-auth.js";
+import {
+  McpHttpPayloadTooLargeError,
+  parseUtf8BodyToJson,
+  readIncomingMessageBodyCapped
+} from "./mcp-http-body-limit.js";
+import {
+  getHttpHost,
+  getHttpPort,
+  getLegacySseMessagesPath,
+  getLegacySsePath,
+  getMcpHttpMaxBodyBytes,
+  getMcpHttpMaxSessions,
+  getMcpPath
+} from "./config.js";
+import { evictOldestSessionIfMapAtCapacity } from "./mcp-session-cap.js";
 
 interface StreamableSession {
   server: ReturnType<typeof createMcpServer>;
@@ -27,6 +42,7 @@ export async function startHttpServer(): Promise<NodeHttpServer> {
   const mcpPath = getMcpPath();
   const ssePath = getLegacySsePath();
   const sseMessagesPath = getLegacySseMessagesPath();
+  const maxSessions = getMcpHttpMaxSessions();
   const streamableSessions = new Map<string, StreamableSession>();
   const sseSessions = new Map<string, SseSession>();
 
@@ -35,17 +51,26 @@ export async function startHttpServer(): Promise<NodeHttpServer> {
       const requestUrl = new URL(request.url || "/", `http://${request.headers.host || "127.0.0.1"}`);
 
       if (requestUrl.pathname === mcpPath) {
+        if (!assertMcpHttpBearerOr401(request, response)) {
+          return;
+        }
         const body = await readParsedBody(request);
-        await handleMcpRequest(request, response, body, streamableSessions);
+        await handleMcpRequest(request, response, body, streamableSessions, maxSessions);
         return;
       }
 
       if (requestUrl.pathname === ssePath && request.method === "GET") {
-        await handleLegacySseConnect(response, sseMessagesPath, sseSessions);
+        if (!assertMcpHttpBearerOr401(request, response)) {
+          return;
+        }
+        await handleLegacySseConnect(response, sseMessagesPath, sseSessions, maxSessions);
         return;
       }
 
       if (requestUrl.pathname === sseMessagesPath && request.method === "POST") {
+        if (!assertMcpHttpBearerOr401(request, response)) {
+          return;
+        }
         const body = await readParsedBody(request);
         await handleLegacySseMessage(requestUrl, request, response, body, sseSessions);
         return;
@@ -55,6 +80,12 @@ export async function startHttpServer(): Promise<NodeHttpServer> {
       response.setHeader("Content-Type", "application/json");
       response.end(JSON.stringify({ error: "Not found" }));
     } catch (error) {
+      if (error instanceof McpHttpPayloadTooLargeError) {
+        if (!response.headersSent) {
+          sendPayloadTooLarge(response, error.limitBytes);
+        }
+        return;
+      }
       const message = error instanceof Error ? error.message : "Internal server error";
       if (!response.headersSent) {
         response.statusCode = 500;
@@ -65,10 +96,13 @@ export async function startHttpServer(): Promise<NodeHttpServer> {
   });
 
   httpServer.on("close", () => {
-    void Promise.all([
+    Promise.all([
       ...Array.from(streamableSessions.values()).map((session) => closeStreamableSession(session)),
       ...Array.from(sseSessions.values()).map((session) => closeSseSession(session))
-    ]);
+    ]).catch((reason) => {
+      const detail = reason instanceof Error ? reason.stack ?? reason.message : String(reason);
+      process.stderr.write(`[peoplesafe-mcp] HTTP server session cleanup failed: ${detail}\n`);
+    });
   });
 
   await new Promise<void>((resolve, reject) => {
@@ -89,6 +123,7 @@ export async function startHttpServer(): Promise<NodeHttpServer> {
 export async function startSseServer(): Promise<NodeHttpServer> {
   const ssePath = getLegacySsePath();
   const sseMessagesPath = getLegacySseMessagesPath();
+  const maxSessions = getMcpHttpMaxSessions();
   const sseSessions = new Map<string, SseSession>();
 
   const httpServer = createServer(async (request, response) => {
@@ -96,11 +131,17 @@ export async function startSseServer(): Promise<NodeHttpServer> {
       const requestUrl = new URL(request.url || "/", `http://${request.headers.host || "127.0.0.1"}`);
 
       if (requestUrl.pathname === ssePath && request.method === "GET") {
-        await handleLegacySseConnect(response, sseMessagesPath, sseSessions);
+        if (!assertMcpHttpBearerOr401(request, response)) {
+          return;
+        }
+        await handleLegacySseConnect(response, sseMessagesPath, sseSessions, maxSessions);
         return;
       }
 
       if (requestUrl.pathname === sseMessagesPath && request.method === "POST") {
+        if (!assertMcpHttpBearerOr401(request, response)) {
+          return;
+        }
         const body = await readParsedBody(request);
         await handleLegacySseMessage(requestUrl, request, response, body, sseSessions);
         return;
@@ -110,6 +151,12 @@ export async function startSseServer(): Promise<NodeHttpServer> {
       response.setHeader("Content-Type", "application/json");
       response.end(JSON.stringify({ error: "Not found" }));
     } catch (error) {
+      if (error instanceof McpHttpPayloadTooLargeError) {
+        if (!response.headersSent) {
+          sendPayloadTooLarge(response, error.limitBytes);
+        }
+        return;
+      }
       const message = error instanceof Error ? error.message : "Internal server error";
       if (!response.headersSent) {
         response.statusCode = 500;
@@ -120,7 +167,10 @@ export async function startSseServer(): Promise<NodeHttpServer> {
   });
 
   httpServer.on("close", () => {
-    void Promise.all(Array.from(sseSessions.values()).map((session) => closeSseSession(session)));
+    Promise.all(Array.from(sseSessions.values()).map((session) => closeSseSession(session))).catch((reason) => {
+      const detail = reason instanceof Error ? reason.stack ?? reason.message : String(reason);
+      process.stderr.write(`[peoplesafe-mcp] SSE server session cleanup failed: ${detail}\n`);
+    });
   });
 
   await new Promise<void>((resolve, reject) => {
@@ -142,7 +192,8 @@ async function handleMcpRequest(
   request: IncomingMessage,
   response: ServerResponse,
   parsedBody: unknown,
-  sessions: Map<string, StreamableSession>
+  sessions: Map<string, StreamableSession>,
+  maxSessions: number
 ): Promise<void> {
   const sessionIdHeader = getSessionIdHeader(request);
 
@@ -169,6 +220,14 @@ async function handleMcpRequest(
     onsessioninitialized: (sessionId) => {
       if (!session) {
         return;
+      }
+      if (!sessions.has(sessionId)) {
+        evictOldestSessionIfMapAtCapacity(
+          sessions,
+          maxSessions,
+          (s) => closeStreamableSession(s),
+          "streamable HTTP"
+        );
       }
       sessions.set(sessionId, session);
     },
@@ -202,12 +261,16 @@ async function handleMcpRequest(
 async function handleLegacySseConnect(
   response: ServerResponse,
   messagesPath: string,
-  sessions: Map<string, SseSession>
+  sessions: Map<string, SseSession>,
+  maxSessions: number
 ): Promise<void> {
   const server = createMcpServer();
   const transport = new SSEServerTransport(messagesPath, response);
   const sessionId = transport.sessionId;
   const session = { server, transport };
+  if (!sessions.has(sessionId)) {
+    evictOldestSessionIfMapAtCapacity(sessions, maxSessions, (s) => closeSseSession(s), "SSE");
+  }
   sessions.set(sessionId, session);
 
   transport.onclose = () => {
@@ -250,25 +313,18 @@ async function readParsedBody(request: IncomingMessage): Promise<unknown> {
     return undefined;
   }
 
-  const chunks: Buffer[] = [];
-  for await (const chunk of request) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-
-  if (chunks.length === 0) {
+  const buf = await readIncomingMessageBodyCapped(request, getMcpHttpMaxBodyBytes());
+  if (!buf || buf.length === 0) {
     return undefined;
   }
 
-  const rawBody = Buffer.concat(chunks).toString("utf8");
-  if (!rawBody.trim()) {
-    return undefined;
-  }
+  return parseUtf8BodyToJson(buf.toString("utf8"));
+}
 
-  try {
-    return JSON.parse(rawBody);
-  } catch {
-    return rawBody;
-  }
+function sendPayloadTooLarge(response: ServerResponse, limitBytes: number): void {
+  response.statusCode = 413;
+  response.setHeader("Content-Type", "application/json");
+  response.end(JSON.stringify({ error: "Payload Too Large", limitBytes }));
 }
 
 function getSessionIdHeader(request: IncomingMessage): string | undefined {

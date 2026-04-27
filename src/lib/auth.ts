@@ -3,44 +3,6 @@ import { getCredentialDefaults } from "./json-credentials.js";
 export const MISSING_CONTEXT_MESSAGE =
   "I need your Peoplesafe API Base URL, Auth Token, and Subscription Key to proceed.";
 
-export interface ApiContextInput {
-  baseUrl?: string | null | undefined;
-  authToken?: string | null | undefined;
-  subscriptionKey?: string | null | undefined;
-}
-
-function normalizeOptionalCredentialString(value: unknown): string | undefined {
-  if (value === null || value === undefined) {
-    return undefined;
-  }
-  if (typeof value !== "string") {
-    return undefined;
-  }
-  const trimmed = value.trim();
-  return trimmed ? trimmed : undefined;
-}
-
-/**
- * If canonical env keys are missing, accept any PEOPLESAFE_* key whose name suggests a URL and whose value looks like http(s).
- * (Guards against typos like PEOPLESAFE_USER_MANAGEMENT_BASE that still hold the real URL.)
- */
-function discoverPeoplesafeBaseUrlFromEnvKeys(): string | undefined {
-  for (const key of Object.keys(process.env).sort()) {
-    if (!/^PEOPLESAFE_/i.test(key)) {
-      continue;
-    }
-    if (!/(BASE|URL)/i.test(key)) {
-      continue;
-    }
-    const v = process.env[key]?.trim();
-    if (!v || !/^https?:\/\//i.test(v)) {
-      continue;
-    }
-    return v;
-  }
-  return undefined;
-}
-
 export interface PeoplesafeApiContext {
   baseUrl: string;
   authToken: string;
@@ -51,6 +13,52 @@ interface ResolvedCredentialParts {
   baseUrl: string | undefined;
   authToken: string | undefined;
   subscriptionKey: string | undefined;
+}
+
+function isPeoplesafeAllowHttp(): boolean {
+  const v = process.env.PEOPLESAFE_ALLOW_HTTP?.trim().toLowerCase();
+  return v === "true" || v === "1" || v === "yes";
+}
+
+let insecureHttpRejectedLogged = false;
+let nonHttpsSchemeRejectedLogged = false;
+
+/**
+ * Only `https://` is accepted by default. `http://` is allowed only when
+ * `PEOPLESAFE_ALLOW_HTTP` is true (local dev). Any other value (missing scheme,
+ * `ftp://`, host-only, etc.) is rejected.
+ */
+export function acceptPeoplesafeBaseUrl(candidate: string | undefined): string | undefined {
+  if (!candidate?.trim()) {
+    return undefined;
+  }
+
+  const trimmed = candidate.trim();
+
+  if (/^https:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (/^http:\/\//i.test(trimmed)) {
+    if (isPeoplesafeAllowHttp()) {
+      return trimmed;
+    }
+    if (!insecureHttpRejectedLogged) {
+      insecureHttpRejectedLogged = true;
+      process.stderr.write(
+        "[peoplesafe-mcp] Rejecting http:// API base URL (credentials would be sent in plaintext). Use https:// or set PEOPLESAFE_ALLOW_HTTP=true for local development only.\n"
+      );
+    }
+    return undefined;
+  }
+
+  if (!nonHttpsSchemeRejectedLogged) {
+    nonHttpsSchemeRejectedLogged = true;
+    process.stderr.write(
+      "[peoplesafe-mcp] Rejecting API base URL: must start with https:// (or http:// only when PEOPLESAFE_ALLOW_HTTP=true).\n"
+    );
+  }
+  return undefined;
 }
 
 /**
@@ -93,6 +101,60 @@ const AUTH_ENV_KEYS = ["PEOPLESAFE_AUTH_TOKEN", "PEOPLESAFE_AUTH_KEY", "PEOPLESA
 
 const SUBSCRIPTION_ENV_KEYS = ["PEOPLESAFE_SUBSCRIPTION_KEY", "PEOPLESAFE_SUBSCRIPTION_KEY_HEADER"] as const;
 
+/**
+ * First base URL from ordered PEOPLESAFE_* env keys that passes {@link acceptPeoplesafeBaseUrl}
+ * (so an invalid `http://` in an early key does not hide a valid `https://` in a later one).
+ */
+function resolveFirstAcceptedCanonicalBaseUrlFromEnv(): string | undefined {
+  for (const name of BASE_URL_ENV_KEYS) {
+    const direct = process.env[name]?.trim();
+    const ok = acceptPeoplesafeBaseUrl(direct);
+    if (ok) {
+      return ok;
+    }
+  }
+
+  for (const name of BASE_URL_ENV_KEYS) {
+    const upper = name.toUpperCase();
+    for (const key of Object.keys(process.env)) {
+      if (key.toUpperCase() !== upper) {
+        continue;
+      }
+      const v = process.env[key]?.trim();
+      const accepted = acceptPeoplesafeBaseUrl(v);
+      if (accepted) {
+        return accepted;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * If canonical env keys are missing or all rejected, accept any PEOPLESAFE_* key whose name suggests a URL and whose value looks like a URL (https, or http when allowed).
+ * (Guards against typos like PEOPLESAFE_USER_MANAGEMENT_BASE that still hold the real URL.)
+ */
+function resolveFirstAcceptedDiscoveredBaseUrlFromEnv(): string | undefined {
+  for (const key of Object.keys(process.env).sort()) {
+    if (!/^PEOPLESAFE_/i.test(key)) {
+      continue;
+    }
+    if (!/(BASE|URL)/i.test(key)) {
+      continue;
+    }
+    const v = process.env[key]?.trim();
+    if (!v || !/^https?:\/\//i.test(v)) {
+      continue;
+    }
+    const accepted = acceptPeoplesafeBaseUrl(v);
+    if (accepted) {
+      return accepted;
+    }
+  }
+  return undefined;
+}
+
 let credentialFailureDiagnosticsLogged = false;
 
 function logCredentialEnvDiagnosticsOnce(parts: ResolvedCredentialParts): void {
@@ -127,7 +189,7 @@ function logCredentialEnvDiagnosticsOnce(parts: ResolvedCredentialParts): void {
 
 /** Base URL env vars honored by the MCP server (Docker / Claude Desktop `env`). */
 export function resolvePeoplesafeBaseUrlFromEnv(): string | undefined {
-  return readFirstEnvValue(BASE_URL_ENV_KEYS) || discoverPeoplesafeBaseUrlFromEnvKeys();
+  return resolveFirstAcceptedCanonicalBaseUrlFromEnv() || resolveFirstAcceptedDiscoveredBaseUrlFromEnv();
 }
 
 function resolvePeoplesafeAuthTokenFromEnv(): string | undefined {
@@ -138,29 +200,21 @@ function resolvePeoplesafeSubscriptionKeyFromEnv(): string | undefined {
   return readFirstEnvValue(SUBSCRIPTION_ENV_KEYS);
 }
 
-function resolveCredentialParts(input: ApiContextInput): ResolvedCredentialParts {
+function resolveCredentialParts(): ResolvedCredentialParts {
   const defaults = getCredentialDefaults();
 
   const baseUrl =
-    resolvePeoplesafeBaseUrlFromEnv() ||
-    defaults?.baseUrl?.trim() ||
-    normalizeOptionalCredentialString(input.baseUrl);
+    resolvePeoplesafeBaseUrlFromEnv() || acceptPeoplesafeBaseUrl(defaults?.baseUrl?.trim());
 
-  const authToken =
-    resolvePeoplesafeAuthTokenFromEnv() ||
-    defaults?.authToken?.trim() ||
-    normalizeOptionalCredentialString(input.authToken);
+  const authToken = resolvePeoplesafeAuthTokenFromEnv() || defaults?.authToken?.trim();
 
-  const subscriptionKey =
-    resolvePeoplesafeSubscriptionKeyFromEnv() ||
-    defaults?.subscriptionKey?.trim() ||
-    normalizeOptionalCredentialString(input.subscriptionKey);
+  const subscriptionKey = resolvePeoplesafeSubscriptionKeyFromEnv() || defaults?.subscriptionKey?.trim();
 
   return { baseUrl, authToken, subscriptionKey };
 }
 
-export function resolveApiContext(input: ApiContextInput): PeoplesafeApiContext | null {
-  const parts = resolveCredentialParts(input);
+export function resolveApiContext(): PeoplesafeApiContext | null {
+  const parts = resolveCredentialParts();
 
   if (!parts.baseUrl || !parts.authToken || !parts.subscriptionKey) {
     logCredentialEnvDiagnosticsOnce(parts);
@@ -175,13 +229,13 @@ export function resolveApiContext(input: ApiContextInput): PeoplesafeApiContext 
 }
 
 /** Explains which values are still missing (helps debug MCP env vs JSON file). */
-export function buildMissingCredentialsMessage(input: ApiContextInput): string {
-  const parts = resolveCredentialParts(input);
+export function buildMissingCredentialsMessage(): string {
+  const parts = resolveCredentialParts();
   const missing: string[] = [];
 
   if (!parts.baseUrl?.trim()) {
     missing.push(
-      "API base URL — add PEOPLESAFE_BASE_URL (or PEOPLESAFE_URL) to the MCP server `env` in Claude Desktop, or put `baseUrl` / `url` in your credentials JSON (nested `mcpServers.*.env` is supported)"
+      "API base URL — use a full URL starting with https:// (PEOPLESAFE_BASE_URL or PEOPLESAFE_URL in MCP `env`, or baseUrl/url in credentials JSON)"
     );
   }
 

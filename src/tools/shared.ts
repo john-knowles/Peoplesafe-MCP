@@ -17,10 +17,10 @@ export function registerOperations(server: McpServer, operations: OperationDefin
         inputSchema: operation.inputSchema
       },
       async (input): Promise<CallToolResult> => {
-        const apiContext = resolveApiContext(input);
+        const apiContext = resolveApiContext();
 
         if (!apiContext) {
-          return textToolResult(buildMissingCredentialsMessage(input), true);
+          return textToolResult(buildMissingCredentialsMessage(), true);
         }
 
         try {

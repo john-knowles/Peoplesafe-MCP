@@ -27,7 +27,8 @@ Credential resolution:
 
 1. Environment variables: `PEOPLESAFE_BASE_URL`, `PEOPLESAFE_AUTH_TOKEN`, `PEOPLESAFE_SUBSCRIPTION_KEY`
 2. JSON defaults (see below): `PEOPLESAFE_CONFIG_FILE`, `PEOPLESAFE_CONFIG_JSON`, or `args` with `--config /path/to/file.json`
-3. Temporary legacy fallback on MCP tool input: `authToken`, `subscriptionKey` (and optional `baseUrl`)
+
+Secrets are **not** read from tool arguments (so they cannot appear in chat or MCP logs).
 
 If credentials are missing, tools return a short message listing what is still missing (usually base URL, auth token, or subscription key).
 
@@ -39,7 +40,8 @@ The server needs all three values (base URL, auth token, subscription key). You 
 
 Set in your MCP client’s server entry under `env`:
 
-- `PEOPLESAFE_BASE_URL`: Base URL for the Peoplesafe API (e.g. Dev, Test, Staging, or Production). Aliases: `PEOPLESAFE_URL`, `PEOPLESAFE_API_BASE_URL`.
+- `PEOPLESAFE_BASE_URL`: Base URL for the Peoplesafe API (e.g. Dev, Test, Staging, or Production). Aliases: `PEOPLESAFE_URL`, `PEOPLESAFE_API_BASE_URL`. Must use `https://` unless `PEOPLESAFE_ALLOW_HTTP=true` for local-only HTTP endpoints.
+- `PEOPLESAFE_ALLOW_HTTP`: When set to `true`, bare `http://` base URLs are allowed (default is HTTPS-only so credentials are not sent in plaintext).
 - `PEOPLESAFE_AUTH_TOKEN`: Peoplesafe auth token.
 - `PEOPLESAFE_SUBSCRIPTION_KEY`: Subscription key.
 
@@ -49,13 +51,12 @@ Explicit `PEOPLESAFE_*` variables override any value loaded from JSON.
 
 Useful when a desktop client makes long secrets awkward in `env`, or when you want one file to edit.
 
-- `PEOPLESAFE_CONFIG_FILE`: Absolute path to a UTF-8 JSON file. The root value must be an object. Keys are matched at **any nesting depth**, so a paste of Claude Desktop–shaped config (`mcpServers.<name>.env`) still works. Supported key names include `baseUrl`, `url`, `base_url`, `PEOPLESAFE_BASE_URL`, and similar variants for auth and subscription keys.
+- `PEOPLESAFE_CONFIG_FILE`: Path to a UTF-8 **`.json`** file. The file must sit under the process current working directory, the user’s home directory, or a root you set with `PEOPLESAFE_CONFIG_ALLOWED_DIR` (symlinks are resolved; the final path must stay under an allowed root). The root value must be a JSON object. Keys are matched at **any nesting depth**, so a paste of Claude Desktop–shaped config (`mcpServers.<name>.env`) still works. Supported key names include `baseUrl`, `url`, `base_url`, `PEOPLESAFE_BASE_URL`, and similar variants for auth and subscription keys.
+- `PEOPLESAFE_CONFIG_ALLOWED_DIR`: Optional extra directory whose files may be referenced by `PEOPLESAFE_CONFIG_FILE` or `--config` (for configs stored outside cwd/home).
 - `PEOPLESAFE_CONFIG_JSON`: Same object as a JSON string in a single env value (escape quotes as needed inside your client config).
 - Command line: add `"--config", "/absolute/path/to/config.json"` to the server `args` after the script path. This layer wins over `PEOPLESAFE_CONFIG_FILE` and `PEOPLESAFE_CONFIG_JSON` when the same field appears in multiple places.
 
 If you use JSON defaults, you still start the server the same way; the process reads the file when it boots (stdio) or on the first tool call.
-
-Legacy tool-input credentials remain a compatibility fallback where the model passes `authToken`, `subscriptionKey`, or `baseUrl` on a tool call.
 
 ## Rate Limiting & Retries
 
@@ -299,6 +300,7 @@ Important:
 - The Azure deploy workflow is intentionally inactive until you configure a protected GitHub Environment and the required Azure OIDC secrets.
 - Simply keeping the workflow file in this public repo does not connect anything to your Azure account.
 - No deployment can happen unless you manually run the workflow and GitHub Environment access is approved.
+- **Before the first successful deploy**, set **`PEOPLESAFE_BASE_URL`**, **`PEOPLESAFE_AUTH_TOKEN`**, and **`PEOPLESAFE_SUBSCRIPTION_KEY`** on the Function App (Azure Portal, Key Vault references, or CLI). The deploy workflow **fails fast** if any of these are missing so the app does not publish without API credentials.
 
 This repo uses the Node.js v4 programming model in code via `src/functionApp.ts`. The `peoplesafeMcp/function.json` file is included as companion HTTP binding metadata for teams and tooling that still expect an explicit trigger file in the repo.
 

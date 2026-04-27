@@ -1,7 +1,28 @@
-import { ZodError, type ZodTypeAny } from "zod";
+import { ZodError, type ZodIssue, type ZodTypeAny } from "zod";
 import type { OperationDefinition } from "../generated/operations.js";
 import type { PeoplesafeApiContext } from "./auth.js";
 import { getRequestTimeoutMs, isDebugMode } from "./config.js";
+
+/** Response header names safe to expose in MCP tool error JSON (no Set-Cookie, WWW-Authenticate, trace secrets, etc.). */
+const API_ERROR_RESPONSE_HEADER_ALLOWLIST = new Set([
+  "cache-control",
+  "content-type",
+  "retry-after",
+  "x-correlation-id",
+  "x-ms-request-id",
+  "x-request-id"
+]);
+
+function collectAllowlistedResponseHeaders(source: Headers): Record<string, string> | undefined {
+  const out: Record<string, string> = {};
+  source.forEach((value, key) => {
+    const lower = key.toLowerCase();
+    if (API_ERROR_RESPONSE_HEADER_ALLOWLIST.has(lower)) {
+      out[lower] = value;
+    }
+  });
+  return Object.keys(out).length > 0 ? out : undefined;
+}
 
 export interface ApiErrorDetails {
   operation: string;
@@ -26,7 +47,7 @@ export class PeoplesafeApiError extends Error {
 export class PeoplesafeValidationError extends Error {
   constructor(
     message: string,
-    readonly issues: any[]
+    readonly issues: ZodIssue[]
   ) {
     super(message);
     this.name = "PeoplesafeValidationError";
@@ -79,11 +100,6 @@ export async function executeOperation({
   const payload = await readResponsePayload(response);
 
   if (!response.ok) {
-    const errorHeaders: Record<string, string> = {};
-    response.headers.forEach((value, key) => {
-      errorHeaders[key.toLowerCase()] = value;
-    });
-
     throw new PeoplesafeApiError(
       `Peoplesafe API request failed with status ${response.status} ${response.statusText}.`,
       {
@@ -92,7 +108,7 @@ export async function executeOperation({
         path: operation.path,
         status: response.status,
         statusText: response.statusText,
-        headers: errorHeaders,
+        headers: collectAllowlistedResponseHeaders(response.headers),
         response: parsePayloadWithSchema(operation.errorSchema, payload, { strict: false })
       }
     );

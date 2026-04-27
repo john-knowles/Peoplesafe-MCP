@@ -79,6 +79,22 @@ jobs:
               WEBSITE_RUN_FROM_PACKAGE=1 \
               FUNCTIONS_NODE_BLOCK_ON_ENTRY_POINT_ERROR=true
 
+      - name: Verify Peoplesafe credential app settings exist
+        run: |
+          set -euo pipefail
+          # Non-destructive check: required secrets must already be set on the Function App (Portal, Key Vault refs, or a prior pipeline).
+          for KEY in PEOPLESAFE_BASE_URL PEOPLESAFE_AUTH_TOKEN PEOPLESAFE_SUBSCRIPTION_KEY; do
+            VALUE="$(az functionapp config appsettings list \
+              --resource-group "${{ inputs.resource_group }}" \
+              --name "${{ inputs.function_app_name }}" \
+              --query "[?name=='$KEY'].value | [0]" \
+              -o tsv)"
+            if [ -z "$VALUE" ] || [ "$VALUE" = "null" ]; then
+              echo "::error::Missing app setting $KEY on ${{ inputs.function_app_name }}. Configure PEOPLESAFE_BASE_URL, PEOPLESAFE_AUTH_TOKEN, and PEOPLESAFE_SUBSCRIPTION_KEY in Azure (see README → Azure Functions) before deploying."
+              exit 1
+            fi
+          done
+
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
         with:

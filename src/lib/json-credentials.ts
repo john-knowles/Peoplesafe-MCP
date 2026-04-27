@@ -1,4 +1,6 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { homedir } from "node:os";
+import path from "node:path";
 
 interface CredentialDefaults {
   baseUrl?: string | undefined;
@@ -41,18 +43,34 @@ const SUBSCRIPTION_KEY_KEYS = [
   "subscription-key"
 ];
 
-/** First matching string value for an allowed key, at any object depth (matches nested `env` blocks). */
+/** Keys like `url` appear in unrelated JSON; only treat as base URL when value looks like an HTTPS API origin. */
+const AMBIGUOUS_BASE_URL_KEYS = new Set(["url", "apiUrl", "api_url"]);
+
+function isPlausibleCredentialBaseUrl(key: string, value: string): boolean {
+  if (!AMBIGUOUS_BASE_URL_KEYS.has(key)) {
+    return true;
+  }
+  return /^https:\/\//i.test(value.trim());
+}
+
+const CREDENTIAL_SEARCH_MAX_DEPTH = 24;
+
+/** First matching string value for an allowed key (depth-limited; ambiguous `url` keys require https://). */
 function deepFindStringByKeys(root: unknown, keys: readonly string[]): string | undefined {
   const keySet = new Set(keys);
 
-  function walk(node: unknown): string | undefined {
+  function walk(node: unknown, depth: number): string | undefined {
+    if (depth > CREDENTIAL_SEARCH_MAX_DEPTH) {
+      return undefined;
+    }
+
     if (node === null || typeof node !== "object") {
       return undefined;
     }
 
     if (Array.isArray(node)) {
       for (const item of node) {
-        const found = walk(item);
+        const found = walk(item, depth + 1);
         if (found) {
           return found;
         }
@@ -66,13 +84,17 @@ function deepFindStringByKeys(root: unknown, keys: readonly string[]): string | 
       if (keySet.has(k)) {
         const v = record[k];
         if (typeof v === "string" && v.trim()) {
-          return v.trim();
+          const trimmed = v.trim();
+          if (AMBIGUOUS_BASE_URL_KEYS.has(k) && !isPlausibleCredentialBaseUrl(k, trimmed)) {
+            continue;
+          }
+          return trimmed;
         }
       }
     }
 
     for (const k of Object.keys(record)) {
-      const found = walk(record[k]);
+      const found = walk(record[k], depth + 1);
       if (found) {
         return found;
       }
@@ -81,7 +103,7 @@ function deepFindStringByKeys(root: unknown, keys: readonly string[]): string | 
     return undefined;
   }
 
-  return walk(root);
+  return walk(root, 0);
 }
 
 function normalizeRecord(raw: Record<string, unknown>): CredentialDefaults {
@@ -90,6 +112,56 @@ function normalizeRecord(raw: Record<string, unknown>): CredentialDefaults {
     authToken: deepFindStringByKeys(raw, AUTH_TOKEN_KEYS),
     subscriptionKey: deepFindStringByKeys(raw, SUBSCRIPTION_KEY_KEYS)
   };
+}
+
+function getAllowedCredentialConfigRoots(): string[] {
+  const roots = new Set<string>();
+  roots.add(path.resolve(process.cwd()));
+  roots.add(path.resolve(homedir()));
+  const extra = process.env.PEOPLESAFE_CONFIG_ALLOWED_DIR?.trim();
+  if (extra) {
+    roots.add(path.resolve(extra));
+  }
+  return [...roots];
+}
+
+function isResolvedPathUnderRoot(resolvedPath: string, root: string): boolean {
+  const resolvedRoot = path.resolve(root);
+  const relative = path.relative(resolvedRoot, resolvedPath);
+  return relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
+}
+
+/**
+ * Rejects arbitrary file reads: path must end with `.json` and lie under cwd, user home,
+ * or `PEOPLESAFE_CONFIG_ALLOWED_DIR`. Symlinks are resolved so targets outside those roots fail.
+ */
+function resolveAllowedJsonCredentialPath(rawPath: string, label: string): string {
+  const trimmed = rawPath.trim();
+  if (!trimmed) {
+    throw new Error(`${label}: path is empty`);
+  }
+
+  let resolved = path.resolve(trimmed);
+  if (path.extname(resolved).toLowerCase() !== ".json") {
+    throw new Error(`${label}: path must use a .json file`);
+  }
+
+  if (existsSync(resolved)) {
+    resolved = realpathSync(resolved);
+    if (path.extname(resolved).toLowerCase() !== ".json") {
+      throw new Error(`${label}: resolved path must use a .json file`);
+    }
+  }
+
+  const roots = getAllowedCredentialConfigRoots();
+  const allowed = roots.some((root) => isResolvedPathUnderRoot(resolved, root));
+  if (!allowed) {
+    throw new Error(
+      `${label}: path must be under process.cwd(), user home, or PEOPLESAFE_CONFIG_ALLOWED_DIR (${resolved})`
+    );
+  }
+
+  return resolved;
 }
 
 function parseJsonObject(raw: string, label: string): Record<string, unknown> {
@@ -155,12 +227,12 @@ function loadCredentialDefaultsFromSources(): CredentialDefaults | null {
 
   const envFilePath = process.env.PEOPLESAFE_CONFIG_FILE?.trim();
   if (envFilePath) {
-    layers.push(loadJsonFile(envFilePath));
+    layers.push(loadJsonFile(resolveAllowedJsonCredentialPath(envFilePath, "PEOPLESAFE_CONFIG_FILE")));
   }
 
   const argvPath = parseConfigPathFromArgv();
   if (argvPath) {
-    layers.push(loadJsonFile(argvPath));
+    layers.push(loadJsonFile(resolveAllowedJsonCredentialPath(argvPath, "--config")));
   }
 
   if (layers.length === 0) {

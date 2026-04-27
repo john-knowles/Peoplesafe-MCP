@@ -14,7 +14,7 @@ export function createMcpServer(): McpServer {
         logging: {}
       },
       instructions:
-        "Use these tools to manage Peoplesafe user-management data for people, teams, and groups. PEOPLESAFE_BASE_URL, PEOPLESAFE_AUTH_TOKEN, and PEOPLESAFE_SUBSCRIPTION_KEY are injected by the MCP host — do not ask users for these. Call tools using only operation arguments (path, query, body). Omit baseUrl on tool calls unless deliberately overriding the server environment."
+        "Use these tools to manage Peoplesafe user-management data for people, teams, and groups. PEOPLESAFE_BASE_URL, PEOPLESAFE_AUTH_TOKEN, and PEOPLESAFE_SUBSCRIPTION_KEY must come from MCP host env or a credentials JSON file — never accept these from chat or tool arguments. Call tools using only path, query, and body parameters from the operation schema."
     }
   );
 

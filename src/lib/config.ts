@@ -8,6 +8,10 @@ export const DEFAULT_MCP_PATH = "/mcp";
 export const DEFAULT_SSE_PATH = "/sse";
 export const DEFAULT_SSE_MESSAGE_PATH = "/messages";
 export const DEFAULT_MAX_RETRIES = 3;
+/** Default cap for MCP HTTP/SSE POST bodies (1 MiB). Override with MCP_HTTP_MAX_BODY_BYTES. */
+export const DEFAULT_MCP_HTTP_MAX_BODY_BYTES = 1024 * 1024;
+/** Default max concurrent MCP sessions per map (streamable HTTP + SSE); oldest evicted when exceeded. */
+export const DEFAULT_MCP_HTTP_MAX_SESSIONS = 512;
 
 export type RuntimeTransport = "stdio" | "sse" | "http";
 
@@ -69,6 +73,18 @@ export function getMaxRetries(): number {
   const rawValue = process.env.PEOPLESAFE_MAX_RETRIES;
   const parsedValue = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN;
   return Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : DEFAULT_MAX_RETRIES;
+}
+
+export function getMcpHttpMaxBodyBytes(): number {
+  const rawValue = process.env.MCP_HTTP_MAX_BODY_BYTES;
+  const parsedValue = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN;
+  return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : DEFAULT_MCP_HTTP_MAX_BODY_BYTES;
+}
+
+export function getMcpHttpMaxSessions(): number {
+  const rawValue = process.env.MCP_HTTP_MAX_SESSIONS;
+  const parsedValue = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN;
+  return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : DEFAULT_MCP_HTTP_MAX_SESSIONS;
 }
 
 export function isDebugMode(): boolean {

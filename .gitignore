@@ -1,4 +1,6 @@
 dist
+*.js.map
+**/*.js.map
 node_modules
 .env
 .env.*

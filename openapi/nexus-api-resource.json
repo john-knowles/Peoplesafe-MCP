@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-            "url": "https://api.staging.peoplesafe.tech/user-management"
+            "url": "https://api.peoplesafe.io/user-management"
         }
     ],
     "paths": {
@@ -874,6 +874,350 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/team/{identifier}/users": {
+            "get": {
+                "tags": [
+                    "Team"
+                ],
+                "summary": "Get team users by identifier",
+                "description": "Returns team members based on Group ID in Nexus or identifier.",
+                "operationId": "queries-api_get-team-users",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "description": "Team ID in Nexus or identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contains users of the team.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/teamUsersResponse"
+                                },
+                                "example": {
+                                    "teamUsers": [
+                                        {
+                                            "identifier": "string",
+                                            "id": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/people": {
+            "get": {
+                "tags": [
+                    "Person"
+                ],
+                "summary": "Get Persons from nexus.",
+                "description": "Returns the People from Nexus.",
+                "operationId": "queries-api_get-people",
+                "parameters": [
+                    {
+                        "name": "Page",
+                        "in": "query",
+                        "description": "Page to return.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "PageSize",
+                        "in": "query",
+                        "description": "Size of the page to return.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "FirstName",
+                        "in": "query",
+                        "description": "Persons first name to filter by.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "LastName",
+                        "in": "query",
+                        "description": "Persons last name to filter by.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Email",
+                        "in": "query",
+                        "description": "Persons e-mail address to filter by.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "PhoneNumber",
+                        "in": "query",
+                        "description": "Persons phone number to filter by.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contains list of persons details.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/getPersonsResponse"
+                                },
+                                "example": {
+                                    "count": 0,
+                                    "persons": [
+                                        {
+                                            "id": "string",
+                                            "userReference": "string",
+                                            "emailAddress": "string",
+                                            "firstName": "string",
+                                            "lastName": "string",
+                                            "hasPortalAccess": true,
+                                            "jobTitle": "string",
+                                            "dateOfBirth": "string",
+                                            "sexAssignedAtBirth": "string",
+                                            "roles": [
+                                                0
+                                            ],
+                                            "codeWord": "string",
+                                            "pin": 0,
+                                            "contactPhoneNumbers": [
+                                                {
+                                                    "type": 0,
+                                                    "number": "string",
+                                                    "isPrimary": true
+                                                }
+                                            ],
+                                            "emergencyContacts": [
+                                                {
+                                                    "firstName": "string",
+                                                    "lastName": "string",
+                                                    "relationship": "string",
+                                                    "phoneNumber": "string"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/person/{identifier}": {
+            "get": {
+                "tags": [
+                    "Person"
+                ],
+                "summary": "Get Person by Identifier",
+                "description": "Returns person details based on person ID in Nexus or Identifier.",
+                "operationId": "queries-api_get-person-by-identifier",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "description": "Person ID in nexus or Identifier.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contains person details.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/getPersonResponse"
+                                },
+                                "example": {
+                                    "person": {
+                                        "id": "string",
+                                        "userReference": "string",
+                                        "emailAddress": "string",
+                                        "firstName": "string",
+                                        "lastName": "string",
+                                        "hasPortalAccess": true,
+                                        "jobTitle": "string",
+                                        "dateOfBirth": "string",
+                                        "sexAssignedAtBirth": "string",
+                                        "roles": [
+                                            0
+                                        ],
+                                        "codeWord": "string",
+                                        "pin": 0,
+                                        "contactPhoneNumbers": [
+                                            {
+                                                "type": 0,
+                                                "number": "string",
+                                                "isPrimary": true
+                                            }
+                                        ],
+                                        "emergencyContacts": [
+                                            {
+                                                "firstName": "string",
+                                                "lastName": "string",
+                                                "relationship": "string",
+                                                "phoneNumber": "string"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/group/{identifier}": {
+            "get": {
+                "tags": [
+                    "ReportingGroup"
+                ],
+                "summary": "Get group details by identifier",
+                "description": "Returns group details based on Group ID in Nexus or identifier.",
+                "operationId": "queries-api_get-group-details",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "description": "Group ID in Nexus or identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contains details of the group.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/groupDetailsResponse"
+                                },
+                                "example": {
+                                    "id": "string",
+                                    "identifier": "string",
+                                    "name": "string",
+                                    "description": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/group/{identifier}/members": {
+            "get": {
+                "tags": [
+                    "ReportingGroup"
+                ],
+                "summary": "Get group members by identifier",
+                "description": "Returns group members based on Group ID in Nexus or identifier.",
+                "operationId": "queries-api_get-group-members",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "description": "Group ID in Nexus or identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contains members of the group.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/groupMembersResponse"
+                                },
+                                "example": {
+                                    "teams": [
+                                        {
+                                            "id": "string",
+                                            "teamReference": "string"
+                                        }
+                                    ],
+                                    "groups": [
+                                        {
+                                            "id": "string",
+                                            "groupReference": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/team/{identifier}": {
+            "get": {
+                "tags": [
+                    "Team"
+                ],
+                "summary": "Get team details by identifier",
+                "description": "Returns team details based on Team ID in Nexus or identifier.",
+                "operationId": "queries-api_get-team-details",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "description": "Team ID in Nexus or identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contains details of the team.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/teamDetailsResponse"
+                                },
+                                "example": {
+                                    "id": "string",
+                                    "identifier": "string",
+                                    "name": "string",
+                                    "description": "string"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -3590,350 +3934,6 @@
                 }
             }
         },
-        "/team/{identifier}/users": {
-            "get": {
-                "tags": [
-                    "Team"
-                ],
-                "summary": "Get team users by identifier",
-                "description": "Returns team members based on Group ID in Nexus or identifier.",
-                "operationId": "queries-api_get-team-users",
-                "parameters": [
-                    {
-                        "name": "identifier",
-                        "in": "path",
-                        "description": "Team ID in Nexus or identifier",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Contains users of the team.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/teamUsersResponse"
-                                },
-                                "example": {
-                                    "teamUsers": [
-                                        {
-                                            "identifier": "string",
-                                            "id": "string"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/people": {
-            "get": {
-                "tags": [
-                    "Person"
-                ],
-                "summary": "Get Persons from nexus.",
-                "description": "Returns the People from Nexus.",
-                "operationId": "queries-api_get-people",
-                "parameters": [
-                    {
-                        "name": "Page",
-                        "in": "query",
-                        "description": "Page to return.",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int32"
-                        }
-                    },
-                    {
-                        "name": "PageSize",
-                        "in": "query",
-                        "description": "Size of the page to return.",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int32"
-                        }
-                    },
-                    {
-                        "name": "FirstName",
-                        "in": "query",
-                        "description": "Persons first name to filter by.",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "LastName",
-                        "in": "query",
-                        "description": "Persons last name to filter by.",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "Email",
-                        "in": "query",
-                        "description": "Persons e-mail address to filter by.",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "PhoneNumber",
-                        "in": "query",
-                        "description": "Persons phone number to filter by.",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Contains list of persons details.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/getPersonsResponse"
-                                },
-                                "example": {
-                                    "count": 0,
-                                    "persons": [
-                                        {
-                                            "id": "string",
-                                            "userReference": "string",
-                                            "emailAddress": "string",
-                                            "firstName": "string",
-                                            "lastName": "string",
-                                            "hasPortalAccess": true,
-                                            "jobTitle": "string",
-                                            "dateOfBirth": "string",
-                                            "sexAssignedAtBirth": "string",
-                                            "roles": [
-                                                0
-                                            ],
-                                            "codeWord": "string",
-                                            "pin": 0,
-                                            "contactPhoneNumbers": [
-                                                {
-                                                    "type": 0,
-                                                    "number": "string",
-                                                    "isPrimary": true
-                                                }
-                                            ],
-                                            "emergencyContacts": [
-                                                {
-                                                    "firstName": "string",
-                                                    "lastName": "string",
-                                                    "relationship": "string",
-                                                    "phoneNumber": "string"
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/person/{identifier}": {
-            "get": {
-                "tags": [
-                    "Person"
-                ],
-                "summary": "Get Person by Identifier",
-                "description": "Returns person details based on person ID in Nexus or Identifier.",
-                "operationId": "queries-api_get-person-by-identifier",
-                "parameters": [
-                    {
-                        "name": "identifier",
-                        "in": "path",
-                        "description": "Person ID in nexus or Identifier.",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Contains person details.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/getPersonResponse"
-                                },
-                                "example": {
-                                    "person": {
-                                        "id": "string",
-                                        "userReference": "string",
-                                        "emailAddress": "string",
-                                        "firstName": "string",
-                                        "lastName": "string",
-                                        "hasPortalAccess": true,
-                                        "jobTitle": "string",
-                                        "dateOfBirth": "string",
-                                        "sexAssignedAtBirth": "string",
-                                        "roles": [
-                                            0
-                                        ],
-                                        "codeWord": "string",
-                                        "pin": 0,
-                                        "contactPhoneNumbers": [
-                                            {
-                                                "type": 0,
-                                                "number": "string",
-                                                "isPrimary": true
-                                            }
-                                        ],
-                                        "emergencyContacts": [
-                                            {
-                                                "firstName": "string",
-                                                "lastName": "string",
-                                                "relationship": "string",
-                                                "phoneNumber": "string"
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/group/{identifier}": {
-            "get": {
-                "tags": [
-                    "ReportingGroup"
-                ],
-                "summary": "Get group details by identifier",
-                "description": "Returns group details based on Group ID in Nexus or identifier.",
-                "operationId": "queries-api_get-group-details",
-                "parameters": [
-                    {
-                        "name": "identifier",
-                        "in": "path",
-                        "description": "Group ID in Nexus or identifier",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Contains details of the group.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/groupDetailsResponse"
-                                },
-                                "example": {
-                                    "id": "string",
-                                    "identifier": "string",
-                                    "name": "string",
-                                    "description": "string"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/group/{identifier}/members": {
-            "get": {
-                "tags": [
-                    "ReportingGroup"
-                ],
-                "summary": "Get group members by identifier",
-                "description": "Returns group members based on Group ID in Nexus or identifier.",
-                "operationId": "queries-api_get-group-members",
-                "parameters": [
-                    {
-                        "name": "identifier",
-                        "in": "path",
-                        "description": "Group ID in Nexus or identifier",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Contains members of the group.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/groupMembersResponse"
-                                },
-                                "example": {
-                                    "teams": [
-                                        {
-                                            "id": "string",
-                                            "teamReference": "string"
-                                        }
-                                    ],
-                                    "groups": [
-                                        {
-                                            "id": "string",
-                                            "groupReference": "string"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/team/{identifier}": {
-            "get": {
-                "tags": [
-                    "Team"
-                ],
-                "summary": "Get team details by identifier",
-                "description": "Returns team details based on Team ID in Nexus or identifier.",
-                "operationId": "queries-api_get-team-details",
-                "parameters": [
-                    {
-                        "name": "identifier",
-                        "in": "path",
-                        "description": "Team ID in Nexus or identifier",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Contains details of the team.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/teamDetailsResponse"
-                                },
-                                "example": {
-                                    "id": "string",
-                                    "identifier": "string",
-                                    "name": "string",
-                                    "description": "string"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/person/{identifier}/patch": {
             "patch": {
                 "tags": [
@@ -5381,346 +5381,6 @@
                 },
                 "additionalProperties": false
             },
-            "emergencyContact": {
-                "required": [
-                    "firstName",
-                    "lastName",
-                    "relationship",
-                    "phoneNumber"
-                ],
-                "type": "object",
-                "properties": {
-                    "firstName": {
-                        "minLength": 1,
-                        "type": "string"
-                    },
-                    "lastName": {
-                        "minLength": 1,
-                        "type": "string"
-                    },
-                    "relationship": {
-                        "minLength": 1,
-                        "type": "string"
-                    },
-                    "phoneNumber": {
-                        "minLength": 1,
-                        "type": "string"
-                    }
-                }
-            },
-            "getPersonResponse": {
-                "type": "object",
-                "properties": {
-                    "person": {
-                        "$ref": "#/components/schemas/person"
-                    }
-                }
-            },
-            "getPersonsResponse": {
-                "type": "object",
-                "properties": {
-                    "count": {
-                        "type": "integer",
-                        "description": "Total count of the Persons.",
-                        "format": "int32"
-                    },
-                    "persons": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/person"
-                        },
-                        "description": "List of the Persons."
-                    }
-                }
-            },
-            "getTeamsResponse": {
-                "type": "object",
-                "properties": {
-                    "count": {
-                        "type": "integer",
-                        "description": "Total count of Teams.",
-                        "format": "int32"
-                    },
-                    "teams": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/teamItem"
-                        },
-                        "description": "List of teams."
-                    }
-                }
-            },
-            "group": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Id of the Group from the Nexus."
-                    },
-                    "groupReference": {
-                        "type": "string",
-                        "description": "Custom reference of the Group."
-                    }
-                }
-            },
-            "groupDetailsResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Id of the group from the Nexus."
-                    },
-                    "identifier": {
-                        "type": "string",
-                        "description": "Custom identifier of the group."
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the group."
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Description of the group."
-                    }
-                }
-            },
-            "groupMembersResponse": {
-                "type": "object",
-                "properties": {
-                    "teams": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/team"
-                        },
-                        "description": "Team members of the group."
-                    },
-                    "groups": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/group"
-                        },
-                        "description": "Group members of the group."
-                    }
-                }
-            },
-            "person": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Id of the person from Nexus."
-                    },
-                    "userReference": {
-                        "type": "string",
-                        "description": "External reference to the person in the client system. It will be used to identify the person instead of the Nexus id."
-                    },
-                    "emailAddress": {
-                        "type": "string",
-                        "description": "Email address of the person will be used as the username to login in to Nexus."
-                    },
-                    "firstName": {
-                        "type": "string",
-                        "description": "First name of the person."
-                    },
-                    "lastName": {
-                        "type": "string",
-                        "description": "Last name of the person."
-                    },
-                    "hasPortalAccess": {
-                        "type": "boolean",
-                        "description": "Determines if the person has access to Nexus."
-                    },
-                    "jobTitle": {
-                        "type": "string",
-                        "description": "Persons job title.",
-                        "nullable": true
-                    },
-                    "dateOfBirth": {
-                        "type": "string",
-                        "description": "Persons date of birth. In UTC format.",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "sexAssignedAtBirth": {
-                        "type": "string",
-                        "description": "For sex assigned at birth possible values are:\nFemale\nMale\nPrefer not to say",
-                        "nullable": true
-                    },
-                    "roles": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "format": "int32"
-                        },
-                        "description": "Permission level in Nexus:\nAdmin - 2\nManager - 3\nUser - 4\nEscalationContact - 5"
-                    },
-                    "codeWord": {
-                        "type": "string",
-                        "description": "Code word used",
-                        "nullable": true
-                    },
-                    "pin": {
-                        "type": "integer",
-                        "description": "Pin used during verification on phone lines and in the app. <b>Must be between 0001 and 9998</b>",
-                        "format": "int32",
-                        "nullable": true
-                    },
-                    "contactPhoneNumbers": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/phoneNumber"
-                        },
-                        "description": "Collection of phone numbers. Maximum length is 4.\nAvailable types are:\nWork - 1\nPersonal - 2\nHome - 3\nOffice - 4\n\n<b>Each type can by only once in collection</b>",
-                        "nullable": true
-                    },
-                    "emergencyContacts": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/emergencyContact"
-                        },
-                        "description": "Collection of emergency contacts. Maximum length is 3.",
-                        "nullable": true
-                    }
-                },
-                "description": "Details of the Person."
-            },
-            "personWithSubscriptionResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Id of the Person.",
-                        "format": "uuid"
-                    },
-                    "userReference": {
-                        "type": "string",
-                        "description": "Reference of the Person."
-                    },
-                    "subscriptionType": {
-                        "type": "integer",
-                        "description": "Subscription type of the Person.",
-                        "format": "int32"
-                    },
-                    "subscriptionTypeName": {
-                        "type": "string",
-                        "description": "Subscription name of the Person."
-                    }
-                }
-            },
-            "phoneNumber": {
-                "required": [
-                    "type",
-                    "number",
-                    "isPrimary"
-                ],
-                "type": "object",
-                "properties": {
-                    "type": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "number": {
-                        "minLength": 1,
-                        "type": "string"
-                    },
-                    "isPrimary": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "team": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Id of the Team from the Nexus."
-                    },
-                    "teamReference": {
-                        "type": "string",
-                        "description": "Custom reference of the Team."
-                    }
-                }
-            },
-            "teamDetailsResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Id of the team from the Nexus."
-                    },
-                    "identifier": {
-                        "type": "string",
-                        "description": "Custom identifier of the team."
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the team."
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Description of the Team."
-                    }
-                }
-            },
-            "teamItem": {
-                "type": "object",
-                "properties": {
-                    "reference": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "members": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/teamPerson"
-                        }
-                    },
-                    "managers": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/teamPerson"
-                        }
-                    }
-                }
-            },
-            "teamPerson": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "userReference": {
-                        "type": "string"
-                    }
-                }
-            },
-            "teamUser": {
-                "type": "object",
-                "properties": {
-                    "identifier": {
-                        "type": "string",
-                        "description": "Custom identifier of the user."
-                    },
-                    "id": {
-                        "type": "string",
-                        "description": "Id of the user from the Nexus."
-                    }
-                }
-            },
-            "teamUsersResponse": {
-                "type": "object",
-                "properties": {
-                    "teamUsers": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/teamUser"
-                        },
-                        "description": "List of the team users."
-                    }
-                }
-            },
             "AssignedTeam": {
                 "type": "object",
                 "properties": {
@@ -6179,6 +5839,346 @@
                     }
                 },
                 "additionalProperties": false
+            },
+            "emergencyContact": {
+                "required": [
+                    "firstName",
+                    "lastName",
+                    "relationship",
+                    "phoneNumber"
+                ],
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "relationship": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "phoneNumber": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                }
+            },
+            "getPersonResponse": {
+                "type": "object",
+                "properties": {
+                    "person": {
+                        "$ref": "#/components/schemas/person"
+                    }
+                }
+            },
+            "getPersonsResponse": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "description": "Total count of the Persons.",
+                        "format": "int32"
+                    },
+                    "persons": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/person"
+                        },
+                        "description": "List of the Persons."
+                    }
+                }
+            },
+            "getTeamsResponse": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "description": "Total count of Teams.",
+                        "format": "int32"
+                    },
+                    "teams": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/teamItem"
+                        },
+                        "description": "List of teams."
+                    }
+                }
+            },
+            "group": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the Group from the Nexus."
+                    },
+                    "groupReference": {
+                        "type": "string",
+                        "description": "Custom reference of the Group."
+                    }
+                }
+            },
+            "groupDetailsResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the group from the Nexus."
+                    },
+                    "identifier": {
+                        "type": "string",
+                        "description": "Custom identifier of the group."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the group."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description of the group."
+                    }
+                }
+            },
+            "groupMembersResponse": {
+                "type": "object",
+                "properties": {
+                    "teams": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/team"
+                        },
+                        "description": "Team members of the group."
+                    },
+                    "groups": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/group"
+                        },
+                        "description": "Group members of the group."
+                    }
+                }
+            },
+            "person": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the person from Nexus."
+                    },
+                    "userReference": {
+                        "type": "string",
+                        "description": "External reference to the person in the client system. It will be used to identify the person instead of the Nexus id."
+                    },
+                    "emailAddress": {
+                        "type": "string",
+                        "description": "Email address of the person will be used as the username to login in to Nexus."
+                    },
+                    "firstName": {
+                        "type": "string",
+                        "description": "First name of the person."
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "description": "Last name of the person."
+                    },
+                    "hasPortalAccess": {
+                        "type": "boolean",
+                        "description": "Determines if the person has access to Nexus."
+                    },
+                    "jobTitle": {
+                        "type": "string",
+                        "description": "Persons job title.",
+                        "nullable": true
+                    },
+                    "dateOfBirth": {
+                        "type": "string",
+                        "description": "Persons date of birth. In UTC format.",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "sexAssignedAtBirth": {
+                        "type": "string",
+                        "description": "For sex assigned at birth possible values are:\nFemale\nMale\nPrefer not to say",
+                        "nullable": true
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int32"
+                        },
+                        "description": "Permission level in Nexus:\nAdmin - 2\nManager - 3\nUser - 4\nEscalationContact - 5"
+                    },
+                    "codeWord": {
+                        "type": "string",
+                        "description": "Code word used",
+                        "nullable": true
+                    },
+                    "pin": {
+                        "type": "integer",
+                        "description": "Pin used during verification on phone lines and in the app. <b>Must be between 0001 and 9998</b>",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "contactPhoneNumbers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/phoneNumber"
+                        },
+                        "description": "Collection of phone numbers. Maximum length is 4.\nAvailable types are:\nWork - 1\nPersonal - 2\nHome - 3\nOffice - 4\n\n<b>Each type can by only once in collection</b>",
+                        "nullable": true
+                    },
+                    "emergencyContacts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/emergencyContact"
+                        },
+                        "description": "Collection of emergency contacts. Maximum length is 3.",
+                        "nullable": true
+                    }
+                },
+                "description": "Details of the Person."
+            },
+            "personWithSubscriptionResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the Person.",
+                        "format": "uuid"
+                    },
+                    "userReference": {
+                        "type": "string",
+                        "description": "Reference of the Person."
+                    },
+                    "subscriptionType": {
+                        "type": "integer",
+                        "description": "Subscription type of the Person.",
+                        "format": "int32"
+                    },
+                    "subscriptionTypeName": {
+                        "type": "string",
+                        "description": "Subscription name of the Person."
+                    }
+                }
+            },
+            "phoneNumber": {
+                "required": [
+                    "type",
+                    "number",
+                    "isPrimary"
+                ],
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "number": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "isPrimary": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "team": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the Team from the Nexus."
+                    },
+                    "teamReference": {
+                        "type": "string",
+                        "description": "Custom reference of the Team."
+                    }
+                }
+            },
+            "teamDetailsResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the team from the Nexus."
+                    },
+                    "identifier": {
+                        "type": "string",
+                        "description": "Custom identifier of the team."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the team."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description of the Team."
+                    }
+                }
+            },
+            "teamItem": {
+                "type": "object",
+                "properties": {
+                    "reference": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "members": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/teamPerson"
+                        }
+                    },
+                    "managers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/teamPerson"
+                        }
+                    }
+                }
+            },
+            "teamPerson": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "userReference": {
+                        "type": "string"
+                    }
+                }
+            },
+            "teamUser": {
+                "type": "object",
+                "properties": {
+                    "identifier": {
+                        "type": "string",
+                        "description": "Custom identifier of the user."
+                    },
+                    "id": {
+                        "type": "string",
+                        "description": "Id of the user from the Nexus."
+                    }
+                }
+            },
+            "teamUsersResponse": {
+                "type": "object",
+                "properties": {
+                    "teamUsers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/teamUser"
+                        },
+                        "description": "List of the team users."
+                    }
+                }
             },
             "AssignGroupMemberRequest": {
                 "required": [

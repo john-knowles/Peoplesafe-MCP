@@ -1,0 +1,4 @@
+# Do not ship source maps to Azure (reconstructible TypeScript).
+*.map
+**/*.map
+**/*.js.map

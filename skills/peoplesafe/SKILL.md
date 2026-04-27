@@ -15,7 +15,7 @@ Use this skill when you need to manage Peoplesafe people, teams, reporting group
 ## Working Rules
 
 - Prefer the MCP tools exposed by the `peoplesafe` server over hand-written HTTP requests.
-- If credentials are missing, ask the user for the Peoplesafe Auth Token and Subscription Key.
+- If credentials are missing, tell the user to set them in MCP env or a credentials JSON file — do not collect secrets in chat.
 - Treat the environment as real shared infrastructure and confirm destructive operations when appropriate.
 - When performing lookups, prefer the most specific identifier the user has available.
 
@@ -27,10 +27,11 @@ Use this skill when you need to manage Peoplesafe people, teams, reporting group
 
 ## Authentication
 
-The MCP server accepts credentials via:
+The MCP server resolves credentials only from:
 
-- tool inputs: `authToken`, `subscriptionKey` (and optional `baseUrl`)
 - environment variables: `PEOPLESAFE_BASE_URL`, `PEOPLESAFE_AUTH_TOKEN`, `PEOPLESAFE_SUBSCRIPTION_KEY`
 - JSON file or inline JSON via `PEOPLESAFE_CONFIG_FILE`, `PEOPLESAFE_CONFIG_JSON`, or `--config`
 
-If credentials are unavailable, pause and ask for them instead of retrying blindly.
+Credentials are not accepted via tool arguments (so they cannot leak into conversation logs).
+
+If credentials are unavailable, pause and point the user at env or config setup instead of retrying blindly.

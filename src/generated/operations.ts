@@ -29,26 +29,22 @@ export interface OperationDefinition {
 }
 
 export const PersonCreateInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => CreatePersonRequestSchema).optional()
 }).strict();
 
 export const PersonDeleteInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonArchiveInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonUpdateInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -56,92 +52,19 @@ export const PersonUpdateInputSchema = z.object({
 }).strict();
 
 export const PersonAssignAppSubscriptionInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
   body: z.lazy(() => AssignSubscriptionApiRequestSchema).optional()
 }).strict();
 
-export const GroupCreateInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => CreateReportingGroupRequestSchema).optional()
-}).strict();
-
-export const GroupUpdateInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => UpdateReportingGroupRequestSchema).optional()
-}).strict();
-
-export const GroupDeleteInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => DeleteReportingGroupRequestSchema).optional()
-}).strict();
-
-export const GroupAssignManagerInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => AssignManagerToGroupRequestSchema).optional()
-}).strict();
-
-export const GroupAssignMemberInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => AssignGroupMemberRequestSchema).optional()
-}).strict();
-
-export const GroupRemoveMemberInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => RemoveGroupMemberRequestSchema).optional()
-}).strict();
-
-export const GroupRemoveManagerInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => RemoveManagerFromGroupRequestSchema).optional()
-}).strict();
-
-export const TeamCreateInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => CreateTeamRequestSchema).optional()
-}).strict();
-
-export const TeamUpdateInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => UpdateTeamRequestSchema).optional()
-}).strict();
-
-export const TeamDeleteInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => DeleteTeamRequestSchema).optional()
-}).strict();
-
-export const TeamAssignManagerInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => AssignManagerToTeamRequestSchema).optional()
-}).strict();
-
-export const TeamAssignUsersInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => AssignUsersToTeamRequestSchema).optional()
-}).strict();
-
-export const TeamRemoveManagerInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => RemoveManagerFromTeamRequestSchema).optional()
-}).strict();
-
-export const TeamRemoveUserInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
-  body: z.lazy(() => RemoveUserFromTeamRequestSchema).optional()
-}).strict();
-
 export const TeamGetUsersInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonListInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   query: z.object({
   "Page": z.number().int(),
   "PageSize": z.number().int(),
@@ -153,35 +76,86 @@ export const PersonListInputSchema = z.object({
 }).strict();
 
 export const PersonGetInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const GroupGetInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const GroupGetMembersInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const TeamGetInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
+export const GroupCreateInputSchema = z.object({
+  body: z.lazy(() => CreateReportingGroupRequestSchema).optional()
+}).strict();
+
+export const GroupUpdateInputSchema = z.object({
+  body: z.lazy(() => UpdateReportingGroupRequestSchema).optional()
+}).strict();
+
+export const GroupDeleteInputSchema = z.object({
+  body: z.lazy(() => DeleteReportingGroupRequestSchema).optional()
+}).strict();
+
+export const GroupAssignManagerInputSchema = z.object({
+  body: z.lazy(() => AssignManagerToGroupRequestSchema).optional()
+}).strict();
+
+export const GroupAssignMemberInputSchema = z.object({
+  body: z.lazy(() => AssignGroupMemberRequestSchema).optional()
+}).strict();
+
+export const GroupRemoveMemberInputSchema = z.object({
+  body: z.lazy(() => RemoveGroupMemberRequestSchema).optional()
+}).strict();
+
+export const GroupRemoveManagerInputSchema = z.object({
+  body: z.lazy(() => RemoveManagerFromGroupRequestSchema).optional()
+}).strict();
+
+export const TeamCreateInputSchema = z.object({
+  body: z.lazy(() => CreateTeamRequestSchema).optional()
+}).strict();
+
+export const TeamUpdateInputSchema = z.object({
+  body: z.lazy(() => UpdateTeamRequestSchema).optional()
+}).strict();
+
+export const TeamDeleteInputSchema = z.object({
+  body: z.lazy(() => DeleteTeamRequestSchema).optional()
+}).strict();
+
+export const TeamAssignManagerInputSchema = z.object({
+  body: z.lazy(() => AssignManagerToTeamRequestSchema).optional()
+}).strict();
+
+export const TeamAssignUsersInputSchema = z.object({
+  body: z.lazy(() => AssignUsersToTeamRequestSchema).optional()
+}).strict();
+
+export const TeamRemoveManagerInputSchema = z.object({
+  body: z.lazy(() => RemoveManagerFromTeamRequestSchema).optional()
+}).strict();
+
+export const TeamRemoveUserInputSchema = z.object({
+  body: z.lazy(() => RemoveUserFromTeamRequestSchema).optional()
+}).strict();
+
 export const PersonPatchInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -189,12 +163,10 @@ export const PersonPatchInputSchema = z.object({
 }).strict();
 
 export const GroupPatchParentGroupsInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => PatchGroupParentGroupsRequestSchema).optional()
 }).strict();
 
 export const TeamPatchPersonMembershipInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -202,7 +174,6 @@ export const TeamPatchPersonMembershipInputSchema = z.object({
 }).strict();
 
 export const TeamPatchPersonManagementInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -210,31 +181,25 @@ export const TeamPatchPersonManagementInputSchema = z.object({
 }).strict();
 
 export const TeamPatchParentGroupsInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   body: z.lazy(() => PatchTeamParentGroupsRequestSchema).optional()
 }).strict();
 
 export const TeamListInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   query: z.object({
   "Page": z.number().int(),
   "PageSize": z.number().int()
 }).strict()
 }).strict();
 
-export const PersonListSubscriptionsInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL.")
-}).strict();
+export const PersonListSubscriptionsInputSchema = z.object({}).strict();
 
 export const PersonGetSubscriptionInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict()
 }).strict();
 
 export const PersonAssignSubscriptionInputSchema = z.object({
-  baseUrl: z.preprocess((v) => (v === null || v === "" ? undefined : v), z.string().url().optional()).describe("Always omit unless intentionally overriding the server config. PEOPLESAFE_BASE_URL is set by the MCP host — do not ask the user for a base URL."),
   path: z.object({
   "identifier": z.string()
 }).strict(),
@@ -501,6 +466,50 @@ export const personOperationDefinitions: OperationDefinition[] = [
 
 export const teamOperationDefinitions: OperationDefinition[] = [
   {
+    toolName: "team_get_users",
+    title: "Get team users by identifier",
+    description: "Returns team members based on Group ID in Nexus or identifier.",
+    method: "GET",
+    path: "/team/{identifier}/users",
+    operationId: "queries-api_get-team-users",
+    tag: "team",
+    parameters: [
+      {
+        "location": "path",
+        "name": "identifier",
+        "required": true
+      }
+    ],
+    requestContentType: null,
+    responseContentType: "application/json",
+    inputSchema: TeamGetUsersInputSchema,
+    requestBodySchema: undefined,
+    responseSchema: teamUsersResponseSchema,
+    errorSchema: undefined
+  },
+  {
+    toolName: "team_get",
+    title: "Get team details by identifier",
+    description: "Returns team details based on Team ID in Nexus or identifier.",
+    method: "GET",
+    path: "/team/{identifier}",
+    operationId: "queries-api_get-team-details",
+    tag: "team",
+    parameters: [
+      {
+        "location": "path",
+        "name": "identifier",
+        "required": true
+      }
+    ],
+    requestContentType: null,
+    responseContentType: "application/json",
+    inputSchema: TeamGetInputSchema,
+    requestBodySchema: undefined,
+    responseSchema: teamDetailsResponseSchema,
+    errorSchema: undefined
+  },
+  {
     toolName: "team_create",
     title: "Create Team.",
     description: "Endpoint to create a team in Nexus.",
@@ -613,50 +622,6 @@ export const teamOperationDefinitions: OperationDefinition[] = [
     errorSchema: ErrorResponseSchema
   },
   {
-    toolName: "team_get_users",
-    title: "Get team users by identifier",
-    description: "Returns team members based on Group ID in Nexus or identifier.",
-    method: "GET",
-    path: "/team/{identifier}/users",
-    operationId: "queries-api_get-team-users",
-    tag: "team",
-    parameters: [
-      {
-        "location": "path",
-        "name": "identifier",
-        "required": true
-      }
-    ],
-    requestContentType: null,
-    responseContentType: "application/json",
-    inputSchema: TeamGetUsersInputSchema,
-    requestBodySchema: undefined,
-    responseSchema: teamUsersResponseSchema,
-    errorSchema: undefined
-  },
-  {
-    toolName: "team_get",
-    title: "Get team details by identifier",
-    description: "Returns team details based on Team ID in Nexus or identifier.",
-    method: "GET",
-    path: "/team/{identifier}",
-    operationId: "queries-api_get-team-details",
-    tag: "team",
-    parameters: [
-      {
-        "location": "path",
-        "name": "identifier",
-        "required": true
-      }
-    ],
-    requestContentType: null,
-    responseContentType: "application/json",
-    inputSchema: TeamGetInputSchema,
-    requestBodySchema: undefined,
-    responseSchema: teamDetailsResponseSchema,
-    errorSchema: undefined
-  },
-  {
     toolName: "team_patch_person_membership",
     title: "Updates a persons Team membership",
     description: "Updates a persons Team membership",
@@ -746,6 +711,50 @@ export const teamOperationDefinitions: OperationDefinition[] = [
 ];
 
 export const groupOperationDefinitions: OperationDefinition[] = [
+  {
+    toolName: "group_get",
+    title: "Get group details by identifier",
+    description: "Returns group details based on Group ID in Nexus or identifier.",
+    method: "GET",
+    path: "/group/{identifier}",
+    operationId: "queries-api_get-group-details",
+    tag: "group",
+    parameters: [
+      {
+        "location": "path",
+        "name": "identifier",
+        "required": true
+      }
+    ],
+    requestContentType: null,
+    responseContentType: "application/json",
+    inputSchema: GroupGetInputSchema,
+    requestBodySchema: undefined,
+    responseSchema: groupDetailsResponseSchema,
+    errorSchema: undefined
+  },
+  {
+    toolName: "group_get_members",
+    title: "Get group members by identifier",
+    description: "Returns group members based on Group ID in Nexus or identifier.",
+    method: "GET",
+    path: "/group/{identifier}/members",
+    operationId: "queries-api_get-group-members",
+    tag: "group",
+    parameters: [
+      {
+        "location": "path",
+        "name": "identifier",
+        "required": true
+      }
+    ],
+    requestContentType: null,
+    responseContentType: "application/json",
+    inputSchema: GroupGetMembersInputSchema,
+    requestBodySchema: undefined,
+    responseSchema: groupMembersResponseSchema,
+    errorSchema: undefined
+  },
   {
     toolName: "group_create",
     title: "Create group.",
@@ -857,50 +866,6 @@ export const groupOperationDefinitions: OperationDefinition[] = [
     requestBodySchema: RemoveManagerFromGroupRequestSchema,
     responseSchema: RemoveManagerFromGroupResponseSchema,
     errorSchema: ErrorResponseSchema
-  },
-  {
-    toolName: "group_get",
-    title: "Get group details by identifier",
-    description: "Returns group details based on Group ID in Nexus or identifier.",
-    method: "GET",
-    path: "/group/{identifier}",
-    operationId: "queries-api_get-group-details",
-    tag: "group",
-    parameters: [
-      {
-        "location": "path",
-        "name": "identifier",
-        "required": true
-      }
-    ],
-    requestContentType: null,
-    responseContentType: "application/json",
-    inputSchema: GroupGetInputSchema,
-    requestBodySchema: undefined,
-    responseSchema: groupDetailsResponseSchema,
-    errorSchema: undefined
-  },
-  {
-    toolName: "group_get_members",
-    title: "Get group members by identifier",
-    description: "Returns group members based on Group ID in Nexus or identifier.",
-    method: "GET",
-    path: "/group/{identifier}/members",
-    operationId: "queries-api_get-group-members",
-    tag: "group",
-    parameters: [
-      {
-        "location": "path",
-        "name": "identifier",
-        "required": true
-      }
-    ],
-    requestContentType: null,
-    responseContentType: "application/json",
-    inputSchema: GroupGetMembersInputSchema,
-    requestBodySchema: undefined,
-    responseSchema: groupMembersResponseSchema,
-    errorSchema: undefined
   },
   {
     toolName: "group_patch_parent_groups",
