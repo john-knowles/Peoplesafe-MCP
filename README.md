@@ -83,7 +83,7 @@ The server automatically honors Azure’s assigned `PORT` and binds to `0.0.0.0`
 
 | Client | File in repo | Transport | Notes |
 | --- | --- | --- | --- |
-| Claude Desktop | `claude_config_snippet.json` | `stdio` | Uses `npx` + `tsx`. On Windows merge into `%APPDATA%\\Claude\\claude_desktop_config.json`. |
+| Claude Desktop | `claude_config_snippet.json` | `stdio` | Uses `node` + `dist/index.js`. On Windows merge into `%APPDATA%\\Claude\\claude_desktop_config.json`. |
 | Cursor | `.cursor/mcp.json` | `stdio` | Workspace config using `npm run start`. |
 | Windsurf | `windsurf_mcp_config.json` | `stdio` | Compatible with `mcpServers` format used by Cascade clients. |
 | VS Code | `.vscode/mcp.json` | `stdio` | Workspace-level MCP config with server name `Peoplesafe`. |
