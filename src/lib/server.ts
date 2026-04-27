@@ -14,7 +14,7 @@ export function createMcpServer(): McpServer {
         logging: {}
       },
       instructions:
-        "Use these tools to manage Peoplesafe user-management data for people, teams, and groups. Provide authToken and subscriptionKey directly on tool calls or set PEOPLESAFE_AUTH_TOKEN and PEOPLESAFE_SUBSCRIPTION_KEY in the environment."
+        "Use these tools to manage Peoplesafe user-management data for people, teams, and groups. Ensure PEOPLESAFE_AUTH_TOKEN and PEOPLESAFE_SUBSCRIPTION_KEY are set in the environment variables."
     }
   );
 

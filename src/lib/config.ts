@@ -5,6 +5,7 @@ export const DEFAULT_HTTP_PORT = 3000;
 export const DEFAULT_MCP_PATH = "/mcp";
 export const DEFAULT_SSE_PATH = "/sse";
 export const DEFAULT_SSE_MESSAGE_PATH = "/messages";
+export const DEFAULT_MAX_RETRIES = 3;
 
 export type RuntimeTransport = "stdio" | "sse" | "http";
 
@@ -60,4 +61,17 @@ export function getLegacySsePath(): string {
 
 export function getLegacySseMessagesPath(): string {
   return process.env.MCP_SSE_MESSAGES_PATH?.trim() || DEFAULT_SSE_MESSAGE_PATH;
+}
+
+export function getMaxRetries(): number {
+  const rawValue = process.env.PEOPLESAFE_MAX_RETRIES;
+  const parsedValue = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN;
+  return Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : DEFAULT_MAX_RETRIES;
+}
+
+export function isDebugMode(): boolean {
+  return (
+    process.env.PEOPLESAFE_DEBUG?.trim().toLowerCase() === "true" ||
+    process.env.DEBUG?.includes("peoplesafe") === true
+  );
 }

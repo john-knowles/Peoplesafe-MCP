@@ -134,7 +134,7 @@ function renderZod(schema) {
       const finalExpression = required.has(propertyName) ? propertyExpression : `${propertyExpression}.optional()`;
       return `${JSON.stringify(propertyName)}: ${finalExpression}`;
     });
-    const objectExpression = `z.object({${propertyEntries.length ? `\n${propertyEntries.map((entry) => `  ${entry}`).join(",\n")}\n` : ""}}).passthrough()`;
+    const objectExpression = `z.object({${propertyEntries.length ? `\n${propertyEntries.map((entry) => `  ${entry}`).join(",\n")}\n` : ""}}).strict()`;
     return withNullable(schema, objectExpression);
   }
 
@@ -195,9 +195,7 @@ function buildInputSchemaExpression(operation) {
     : null;
 
   const parts = [
-    `baseUrl: z.string().url().optional()`,
-    `authToken: z.string().min(1).optional()`,
-    `subscriptionKey: z.string().min(1).optional()`
+    `baseUrl: z.string().url().optional()`
   ];
 
   if (pathParameters.length > 0) {

@@ -3,7 +3,8 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { ZodError } from "zod";
 import type { OperationDefinition } from "../generated/operations.js";
 import { MISSING_CONTEXT_MESSAGE, resolveApiContext } from "../lib/auth.js";
-import { executeOperation, PeoplesafeApiError } from "../lib/peoplesafe-api.js";
+import { getMaxRetries } from "../lib/config.js";
+import { executeOperationWithRetry, PeoplesafeApiError, PeoplesafeValidationError } from "../lib/peoplesafe-api.js";
 import { jsonToolResult, textToolResult } from "../lib/results.js";
 
 export function registerOperations(server: McpServer, operations: OperationDefinition[]): void {
@@ -23,10 +24,11 @@ export function registerOperations(server: McpServer, operations: OperationDefin
         }
 
         try {
-          const result = await executeOperation({
+          const result = await executeOperationWithRetry({
             operation,
             input,
-            apiContext
+            apiContext,
+            maxRetries: getMaxRetries()
           });
 
           return jsonToolResult({
@@ -41,6 +43,16 @@ export function registerOperations(server: McpServer, operations: OperationDefin
               {
                 error: error.message,
                 details: error.details
+              },
+              true
+            );
+          }
+
+          if (error instanceof PeoplesafeValidationError) {
+            return jsonToolResult(
+              {
+                error: error.message,
+                issues: error.issues
               },
               true
             );

@@ -23,24 +23,36 @@ Every tool requires:
 - `x-auth-token`
 - `X-Subscription-Key`
 
-Credential resolution order:
+Credential resolution:
 
-1. MCP tool input fields: `authToken`, `subscriptionKey`
-2. Environment variables: `PEOPLESAFE_AUTH_TOKEN`, `PEOPLESAFE_SUBSCRIPTION_KEY`
+1. Environment variables: `PEOPLESAFE_AUTH_TOKEN`, `PEOPLESAFE_SUBSCRIPTION_KEY`
+2. Optional MCP tool input: `baseUrl` (non-sensitive)
 
-If either value is missing, the server returns this exact instruction:
+If credentials are missing, the server returns this exact instruction:
 
 `I need your Peoplesafe API Base URL, Auth Token, and Subscription Key to proceed.`
 
 ## Configuration
 
-The server supports the following environment variables, which can be set in your MCP client's configuration:
+The server supports the following environment variables, which MUST be set in your MCP client's configuration for authentication:
 
 - `PEOPLESAFE_BASE_URL`: The base URL for the Peoplesafe API (e.g., for Dev, Test, Staging, or Production).
-- `PEOPLESAFE_AUTH_TOKEN`: (Optional) Your Peoplesafe Auth Token.
-- `PEOPLESAFE_SUBSCRIPTION_KEY`: (Optional) Your Peoplesafe Subscription Key.
+- `PEOPLESAFE_AUTH_TOKEN`: Your Peoplesafe Auth Token.
+- `PEOPLESAFE_SUBSCRIPTION_KEY`: Your Peoplesafe Subscription Key.
 
-If these values are provided in the configuration, the MCP will use them automatically. If they are omitted or empty, the MCP will ask you for them during the first tool call.
+If these values are provided in the configuration, the MCP will use them automatically. For security, credentials are no longer accepted as tool input parameters.
+
+## Rate Limiting & Retries
+
+The server includes automatic handling for Peoplesafe API rate limits (`429 Too Many Requests`):
+
+- **Automatic Retries**: Tools will automatically retry failed requests that were rate-limited.
+- **Exponential Backoff**: Retries use an exponential backoff strategy (1s, 2s, 4s...) to respect server capacity.
+- **Jitter**: Random jitter is added to retry delays to prevent synchronized request spikes.
+- **Retry-After Support**: If the API provides a `Retry-After` header, the server will honor the requested wait time.
+- **Observability**: Rate limit hits and retry attempts are logged to the server's `stderr` for visibility in MCP clients.
+
+You can configure the maximum number of retries via the `PEOPLESAFE_MAX_RETRIES` environment variable (defaults to `3`).
 
 ## Build And Run
 
@@ -359,6 +371,18 @@ The currently published `@modelcontextprotocol/inspector` package advertises a N
 - Workspace configs assume you have already run `npm run build`.
 - The Claude Desktop and Windsurf repo files use this machine’s current absolute path. If a teammate clones the repo elsewhere, they should update that path before copying the file.
 - The server implementation does not hardcode credentials. If connector-level env values are absent, the MCP tools will tell the AI to ask for them.
+
+## Deployment Security
+
+When deploying this MCP server, especially with HTTP or SSE transports, please adhere to the following security guidelines:
+
+### Security Checklist
+
+- **HTTPS Only**: Always expose the HTTP/SSE endpoints over HTTPS. Do not use plain HTTP in production.
+- **Authentication**: The provided HTTP server does not include its own authentication layer. It should be deployed behind a reverse proxy (e.g., Nginx, Azure App Gateway) or an API Gateway that enforces authentication (e.g., OAuth2, API Keys).
+- **Environment Isolation**: Ensure that environment variables like `PEOPLESAFE_AUTH_TOKEN` are stored securely and not exposed to unauthorized users.
+- **Network Restrictions**: If possible, restrict access to the MCP server's endpoints to known client IP addresses or within a virtual network.
+- **Monitoring**: Enable logging and monitor `stderr` for rate limit hits and validation errors to ensure the server is operating correctly.
 
 ## Verification
 

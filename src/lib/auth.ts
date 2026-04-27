@@ -3,8 +3,6 @@ export const MISSING_CONTEXT_MESSAGE =
 
 export interface ApiContextInput {
   baseUrl?: string | undefined;
-  authToken?: string | undefined;
-  subscriptionKey?: string | undefined;
 }
 
 export interface PeoplesafeApiContext {
@@ -15,9 +13,8 @@ export interface PeoplesafeApiContext {
 
 export function resolveApiContext(input: ApiContextInput): PeoplesafeApiContext | null {
   const baseUrl = input.baseUrl?.trim() || process.env.PEOPLESAFE_BASE_URL?.trim();
-  const authToken = input.authToken?.trim() || process.env.PEOPLESAFE_AUTH_TOKEN?.trim();
-  const subscriptionKey =
-    input.subscriptionKey?.trim() || process.env.PEOPLESAFE_SUBSCRIPTION_KEY?.trim();
+  const authToken = process.env.PEOPLESAFE_AUTH_TOKEN?.trim();
+  const subscriptionKey = process.env.PEOPLESAFE_SUBSCRIPTION_KEY?.trim();
 
   if (!baseUrl || !authToken || !subscriptionKey) {
     return null;
