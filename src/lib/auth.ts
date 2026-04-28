@@ -16,10 +16,10 @@ interface ResolvedCredentialParts {
 }
 
 const PEOPLESAFE_ENV_BASE_URLS = {
-  dev: "https://dev-api.peoplesafe.io/usermanagement",
-  test: "https://test-api.peoplesafe.io/usermanagement",
-  staging: "https://staging-api.peoplesafe.io/usermanagement",
-  production: "https://api.peoplesafe.io/usermanagement"
+  dev: "https://api.dev.peoplesafe.tech/user-management",
+  test: "https://api.test.peoplesafe.tech/user-management",
+  staging: "https://api.staging.peoplesafe.tech/user-management",
+  production: "https://api.peoplesafe.io/user-management"
 } as const;
 
 function resolvePeoplesafeBaseUrlAlias(candidate: string): string {

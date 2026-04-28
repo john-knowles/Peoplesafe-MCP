@@ -49,10 +49,10 @@ Explicit `PEOPLESAFE_*` variables override any value loaded from JSON.
 
 Shorthand environment names (expanded automatically):
 
-- `dev` → `https://dev-api.peoplesafe.io/usermanagement`
-- `test` → `https://test-api.peoplesafe.io/usermanagement`
-- `staging` → `https://staging-api.peoplesafe.io/usermanagement`
-- `production` → `https://api.peoplesafe.io/usermanagement`
+- `dev` → `https://api.dev.peoplesafe.tech/user-management`
+- `test` → `https://api.test.peoplesafe.tech/user-management`
+- `staging` → `https://api.staging.peoplesafe.tech/user-management`
+- `production` → `https://api.peoplesafe.io/user-management`
 
 ### Option B: JSON file or inline JSON
 
