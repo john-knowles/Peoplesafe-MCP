@@ -128,6 +128,29 @@ The server automatically honors Azure’s assigned `PORT` and binds to `0.0.0.0`
 
 File: `claude_config_snippet.json`
 
+Option A (direct env vars):
+
+```json
+{
+  "mcpServers": {
+    "peoplesafe": {
+      "command": "node",
+      "args": [
+        "/path/to/peoplesafe-mcp/dist/index.js"
+      ],
+      "env": {
+        "MCP_TRANSPORT": "stdio",
+        "PEOPLESAFE_BASE_URL": "staging",
+        "PEOPLESAFE_AUTH_TOKEN": "",
+        "PEOPLESAFE_SUBSCRIPTION_KEY": ""
+      }
+    }
+  }
+}
+```
+
+Option B (use a JSON credentials file via `PEOPLESAFE_CONFIG_FILE`):
+
 ```json
 {
   "mcpServers": {
