@@ -58,6 +58,7 @@ Shorthand environment names (expanded automatically):
 
 Useful when a desktop client makes long secrets awkward in `env`, or when you want one file to edit.
 
+- Example file: `peoplesafe.credentials.example.json`
 - `PEOPLESAFE_CONFIG_FILE`: Path to a UTF-8 **`.json`** file. The file must sit under the process current working directory, the user’s home directory, or a root you set with `PEOPLESAFE_CONFIG_ALLOWED_DIR` (symlinks are resolved; the final path must stay under an allowed root). The root value must be a JSON object. Keys are matched at **any nesting depth**, so a paste of Claude Desktop–shaped config (`mcpServers.<name>.env`) still works. Supported key names include `baseUrl`, `url`, `base_url`, `PEOPLESAFE_BASE_URL`, and similar variants for auth and subscription keys.
 - `PEOPLESAFE_CONFIG_ALLOWED_DIR`: Optional extra directory whose files may be referenced by `PEOPLESAFE_CONFIG_FILE` or `--config` (for configs stored outside cwd/home).
 - `PEOPLESAFE_CONFIG_JSON`: Same object as a JSON string in a single env value (escape quotes as needed inside your client config).
