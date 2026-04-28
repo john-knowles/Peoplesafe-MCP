@@ -15,6 +15,21 @@ interface ResolvedCredentialParts {
   subscriptionKey: string | undefined;
 }
 
+const PEOPLESAFE_ENV_BASE_URLS = {
+  dev: "https://dev-api.peoplesafe.io/usermanagement",
+  test: "https://test-api.peoplesafe.io/usermanagement",
+  staging: "https://staging-api.peoplesafe.io/usermanagement",
+  production: "https://api.peoplesafe.io/usermanagement"
+} as const;
+
+function resolvePeoplesafeBaseUrlAlias(candidate: string): string {
+  const key = candidate.trim().toLowerCase();
+  if (key in PEOPLESAFE_ENV_BASE_URLS) {
+    return PEOPLESAFE_ENV_BASE_URLS[key as keyof typeof PEOPLESAFE_ENV_BASE_URLS];
+  }
+  return candidate.trim();
+}
+
 function isPeoplesafeAllowHttp(): boolean {
   const v = process.env.PEOPLESAFE_ALLOW_HTTP?.trim().toLowerCase();
   return v === "true" || v === "1" || v === "yes";
@@ -33,7 +48,7 @@ export function acceptPeoplesafeBaseUrl(candidate: string | undefined): string |
     return undefined;
   }
 
-  const trimmed = candidate.trim();
+  const trimmed = resolvePeoplesafeBaseUrlAlias(candidate);
 
   if (/^https:\/\//i.test(trimmed)) {
     return trimmed;
@@ -235,7 +250,7 @@ export function buildMissingCredentialsMessage(): string {
 
   if (!parts.baseUrl?.trim()) {
     missing.push(
-      "API base URL — use a full URL starting with https:// (PEOPLESAFE_BASE_URL or PEOPLESAFE_URL in MCP `env`, or baseUrl/url in credentials JSON)"
+      "API base URL — use a full URL starting with https://, or one of: dev, test, staging, production (PEOPLESAFE_BASE_URL or PEOPLESAFE_URL in MCP `env`, or baseUrl/url in credentials JSON)"
     );
   }
 

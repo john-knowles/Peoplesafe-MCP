@@ -40,12 +40,19 @@ The server needs all three values (base URL, auth token, subscription key). You 
 
 Set in your MCP client’s server entry under `env`:
 
-- `PEOPLESAFE_BASE_URL`: Base URL for the Peoplesafe API (e.g. Dev, Test, Staging, or Production). Aliases: `PEOPLESAFE_URL`, `PEOPLESAFE_API_BASE_URL`. Must use `https://` unless `PEOPLESAFE_ALLOW_HTTP=true` for local-only HTTP endpoints.
+- `PEOPLESAFE_BASE_URL`: Base URL for the Peoplesafe API. Set a full URL (must use `https://` unless `PEOPLESAFE_ALLOW_HTTP=true`) **or** use a shorthand environment name: `dev`, `test`, `staging`, `production`. Aliases: `PEOPLESAFE_URL`, `PEOPLESAFE_API_BASE_URL`.
 - `PEOPLESAFE_ALLOW_HTTP`: When set to `true`, bare `http://` base URLs are allowed (default is HTTPS-only so credentials are not sent in plaintext).
 - `PEOPLESAFE_AUTH_TOKEN`: Peoplesafe auth token.
 - `PEOPLESAFE_SUBSCRIPTION_KEY`: Subscription key.
 
 Explicit `PEOPLESAFE_*` variables override any value loaded from JSON.
+
+Shorthand environment names (expanded automatically):
+
+- `dev` → `https://dev-api.peoplesafe.io/usermanagement`
+- `test` → `https://test-api.peoplesafe.io/usermanagement`
+- `staging` → `https://staging-api.peoplesafe.io/usermanagement`
+- `production` → `https://api.peoplesafe.io/usermanagement`
 
 ### Option B: JSON file or inline JSON
 
@@ -70,7 +77,7 @@ The server includes automatic handling for Peoplesafe API rate limits (`429 Too 
 
 You can configure the maximum number of retries via the `PEOPLESAFE_MAX_RETRIES` environment variable (defaults to `3`).
 
-## Build And Run
+## Build and run
 
 ```bash
 npm install
@@ -107,15 +114,13 @@ MCP_TRANSPORT=sse npm start
 
 The server automatically honors Azure’s assigned `PORT` and binds to `0.0.0.0` when running inside App Service.
 
-## Client Integration Matrix
+## Client integration matrix
 
-| Client | File in repo | Transport | Notes |
-| --- | --- | --- | --- |
-| Claude Desktop | `claude_config_snippet.json` | `stdio` | Uses `node` + `dist/index.js`. On Windows merge into `%APPDATA%\\Claude\\claude_desktop_config.json`. |
-| Cursor | `.cursor/mcp.json` | `stdio` | Workspace config using `npm run start`. |
-| Windsurf | `windsurf_mcp_config.json` | `stdio` | Compatible with `mcpServers` format used by Cascade clients. |
-| VS Code | `.vscode/mcp.json` | `stdio` | Workspace-level MCP config with server name `Peoplesafe`. |
-| OpenClaw | `openclaw.json` + `skills/peoplesafe/clawhub.json` | `stdio` | Includes a repo-local skill manifest and skill instructions. |
+- **Claude Desktop**: `claude_config_snippet.json` (stdio). Uses `node` + `dist/index.js`. On Windows merge into `%APPDATA%\\Claude\\claude_desktop_config.json`.
+- **Cursor**: `.cursor/mcp.json` (stdio). Workspace config using `npm run start`.
+- **Windsurf**: `windsurf_mcp_config.json` (stdio). Compatible with `mcpServers` format used by Cascade clients.
+- **VS Code**: `.vscode/mcp.json` (stdio). Workspace-level MCP config with server name `Peoplesafe`.
+- **OpenClaw**: `openclaw.json` + `skills/peoplesafe/clawhub.json` (stdio). Includes a repo-local skill manifest and skill instructions.
 
 ## Copy-Paste Configs
 
@@ -133,9 +138,7 @@ File: `claude_config_snippet.json`
       ],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "",
-        "PEOPLESAFE_AUTH_TOKEN": "",
-        "PEOPLESAFE_SUBSCRIPTION_KEY": ""
+        "PEOPLESAFE_CONFIG_FILE": "/absolute/path/to/peoplesafe.credentials.json"
       }
     }
   }
@@ -156,7 +159,7 @@ File: `.cursor/mcp.json`
       "args": ["run", "start"],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "",
+        "PEOPLESAFE_BASE_URL": "staging",
         "PEOPLESAFE_AUTH_TOKEN": "",
         "PEOPLESAFE_SUBSCRIPTION_KEY": ""
       }
@@ -201,7 +204,7 @@ File: `.vscode/mcp.json`
       "args": ["${workspaceFolder}/dist/index.js"],
       "env": {
         "MCP_TRANSPORT": "stdio",
-        "PEOPLESAFE_BASE_URL": "",
+        "PEOPLESAFE_BASE_URL": "staging",
         "PEOPLESAFE_AUTH_TOKEN": "${env:PEOPLESAFE_AUTH_TOKEN}",
         "PEOPLESAFE_SUBSCRIPTION_KEY": "${env:PEOPLESAFE_SUBSCRIPTION_KEY}"
       }
@@ -318,6 +321,7 @@ Recommended first setup:
 App settings to add:
 
 - `MCP_TRANSPORT` = `sse`
+- `PEOPLESAFE_BASE_URL` = `staging` (or a full `https://...` URL)
 - `PEOPLESAFE_AUTH_TOKEN` = your staging auth token
 - `PEOPLESAFE_SUBSCRIPTION_KEY` = your staging subscription key
 
