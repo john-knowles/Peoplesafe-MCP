@@ -72,6 +72,8 @@ export async function executeOperation({
   const url = buildUrl(operation, input.path ?? {}, input.query ?? {}, apiContext.baseUrl);
   const headers = new Headers({
     Accept: operation.responseContentType || "application/json",
+    // Peoplesafe prod expects X-Auth-Key; staging historically accepted x-auth-token.
+    "X-Auth-Key": apiContext.authToken,
     "x-auth-token": apiContext.authToken,
     "X-Subscription-Key": apiContext.subscriptionKey
   });
